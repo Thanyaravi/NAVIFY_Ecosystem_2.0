@@ -1,0 +1,144 @@
+{
+  "theme": "light",
+  "typography": {
+    "primary_font": "Inter, sans-serif",
+    "headings": {
+      "family": "Inter",
+      "tracking": "tracking-tight",
+      "weights": ["font-semibold", "font-bold"]
+    },
+    "body": {
+      "family": "Inter",
+      "tracking": "tracking-normal",
+      "weights": ["font-normal", "font-medium"]
+    },
+    "scale": {
+      "h1": "text-3xl sm:text-4xl font-bold tracking-tight text-slate-900",
+      "h2": "text-xl sm:text-2xl font-semibold tracking-tight text-slate-900",
+      "h3": "text-lg font-semibold tracking-tight text-slate-900",
+      "body": "text-sm text-slate-600",
+      "micro": "text-xs font-medium text-slate-500 uppercase tracking-widest"
+    }
+  },
+  "colors": {
+    "background": {
+      "page": "bg-gradient-to-br from-[#F8FAFC] via-white to-[#EEF6FF]",
+      "glass_card": "bg-white/60 backdrop-blur-2xl border border-white/60 shadow-[0_8px_32px_rgba(0,0,0,0.04)]",
+      "glass_sidebar": "bg-white/50 backdrop-blur-2xl border-r border-white/60 shadow-[4px_0_24px_rgba(0,0,0,0.02)]"
+    },
+    "text": {
+      "primary": "text-slate-900",
+      "secondary": "text-slate-600",
+      "tertiary": "text-slate-400"
+    },
+    "accents": {
+      "primary": "bg-indigo-600 text-white hover:bg-indigo-700",
+      "primary_soft": "bg-indigo-50 text-indigo-700 border border-indigo-100",
+      "secondary": "bg-blue-600 text-white",
+      "status_success": "bg-emerald-500",
+      "status_warning": "bg-amber-500",
+      "status_error": "bg-rose-500",
+      "status_offline": "bg-slate-300"
+    }
+  },
+  "visual_enhancers": {
+    "glassmorphism": {
+      "description": "Apple Vision Pro style glassmorphism. Never use full transparency without blur. Cards must have a slight white border to define edges against light backgrounds.",
+      "classes": "bg-white/60 backdrop-blur-3xl border border-white/60 shadow-[0_8px_32px_rgba(0,0,0,0.04)]"
+    },
+    "shadows": {
+      "soft": "shadow-[0_4px_24px_rgba(15,23,42,0.04)]",
+      "inner": "shadow-inner"
+    },
+    "radii": {
+      "card": "rounded-[24px]",
+      "button": "rounded-full",
+      "input": "rounded-xl"
+    },
+    "spacing": {
+      "container_padding": "p-6 md:p-8 lg:p-10",
+      "card_padding": "p-6 sm:p-8",
+      "gap": "gap-6 sm:gap-8"
+    }
+  },
+  "motion": {
+    "libraries": ["framer-motion"],
+    "page_transition": {
+      "initial": { "opacity": 0, "y": 10 },
+      "animate": { "opacity": 1, "y": 0 },
+      "transition": { "duration": 0.4, "ease": [0.25, 1, 0.5, 1] }
+    },
+    "hover_states": {
+      "card": "transition-all duration-300 hover:shadow-[0_12px_40px_rgba(15,23,42,0.08)] hover:-translate-y-1 hover:bg-white/80",
+      "button": "transition-all duration-200 active:scale-95"
+    }
+  },
+  "layouts": {
+    "app_shell": "flex h-screen overflow-hidden bg-gradient-to-br from-[#F8FAFC] via-white to-[#EEF6FF]",
+    "sidebar": "w-64 flex-shrink-0 flex flex-col z-20 h-full relative",
+    "main_content": "flex-1 flex flex-col h-full overflow-y-auto relative z-10",
+    "dashboard_grid": "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6",
+    "bento_grid": "grid grid-cols-1 lg:grid-cols-12 gap-6"
+  },
+  "components": {
+    "login_page": {
+      "structure": "Relative full-height container with soft animated CSS blobs (absolute divs with blur-3xl). Centered Glass Card (w-full max-w-md, rounded-[32px], extra padding). Minimal branding.",
+      "blobs": "Absolute elements with bg-indigo-200/40 and bg-blue-200/40, w-[30rem] h-[30rem] rounded-full blur-[100px] mix-blend-multiply opacity-60 animate-pulse."
+    },
+    "sidebar": {
+      "structure": "Glassmorphism styling, padding, list of Nav items. Nav item: flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors. Active: bg-white text-indigo-700 shadow-sm border border-indigo-100/50. Inactive: text-slate-600 hover:bg-white/50 hover:text-slate-900."
+    },
+    "stat_card": {
+      "structure": "Glass card, rounded-[24px]. Top flex row: title (text-slate-500 text-sm) and small icon (lucide, light slate). Value (text-3xl font-bold text-slate-900 tracking-tight). Bottom row: trend indicator or subtle text."
+    },
+    "hardware_status_list": {
+      "structure": "Vertical list inside a glass card. Each row: flex items-center justify-between py-3 border-b border-slate-100 last:border-0. Icon + Label on left, Status Pill (Emerald/Rose/Slate) on right."
+    },
+    "live_monitor": {
+      "structure": "lg:col-span-8 glass card, rounded-[32px] overflow-hidden flex flex-col. Header with title. Body is an aspect-video container with an inner shadow and bg-slate-100/50, displaying a pulsing camera icon and 'Waiting for Raspberry Pi Camera...' text."
+    },
+    "recent_detections": {
+      "structure": "lg:col-span-4 glass card, rounded-[32px]. Timeline layout using framer-motion stagger. Small circular icons per detection type with a thin connecting line."
+    }
+  },
+  "accessibility": {
+    "contrast": "Ensure text contrast on glassmorphic elements is sufficient. Use text-slate-900 on bg-white/60. For buttons, use text-white on bg-indigo-600.",
+    "focus": "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent",
+    "reduced_motion": "Respect prefers-reduced-motion for framer-motion animations."
+  },
+  "media": {
+    "icons_library": "lucide-react",
+    "images": {
+      "abstract_background": {
+        "url": "https://images.unsplash.com/photo-1658604663578-04634f4cb897?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxOTB8MHwxfHNlYXJjaHwxfHxhYnN0cmFjdCUyMHNvZnQlMjBibHVyJTIwbGlnaHQlMjBiYWNrZ3JvdW5kfGVufDB8fHx8MTc4NTUzMTc2NXww&ixlib=rb-4.1.0&q=85",
+        "description": "Soft abstract blur for login background layers or overall app soft ambient backdrops if CSS blobs are insufficient."
+      },
+      "profile_picture": {
+        "url": "https://images.pexels.com/photos/33261951/pexels-photo-33261951.jpeg",
+        "description": "Professional avatar for the top right profile button."
+      }
+    }
+  },
+  "instructions_to_main_agent": [
+    "Prioritize optical alignment and generous whitespace. If in doubt, increase padding. Dashboards should feel spacious, not cramped.",
+    "Never use dark neon colors or cyberpunk styles. Stick strictly to the specified light theme and Apple Vision Pro aesthetic.",
+    "All interactive elements MUST have data-testid attributes (e.g., data-testid='login-submit-button').",
+    "Use framer-motion for smooth entrance animations on dashboard cards (stagger children, fade and slide up).",
+    "Do NOT build a complicated chart dashboard. Follow the specific requirements: Insights is minimal, no complicated analytics.",
+    "Implement the layout with a fixed sidebar and a scrollable main content area.",
+    "Use Shadcn UI components where appropriate, but carefully override their default solid background/border classes with the glassmorphism classes provided (e.g., Card components should use bg-white/60 backdrop-blur-2xl).",
+    "For Typography: Apply tracking-tight to all headings to give it a premium Linear.app feel. Use standard Inter for body text.",
+    "Include soft ambient shadows on cards. Never use hard drop shadows."
+  ],
+  "UNIVERSAL_GUIDELINES_FOR_MAIN_AGENT": [
+    "You tend to converge toward generic, 'on distribution' outputs. Make creative, distinctive frontends that surprise and delight.",
+    "Don't make generic centered layouts, simplistic gradients, and uniform styling.",
+    "Create depth through layered design elements with z-index hierarchy and glassmorphism.",
+    "You MUST NOT apply universal transition. Eg: transition: all. Always add transitions for specific interactive elements.",
+    "You MUST NOT center align the app container, i.e., do not add .App { text-align: center; } in the css file.",
+    "Always use modern button styles like pill-shaped, or rounded-xl with interaction animations & color relevant to the app style.",
+    "NEVER use AI assistant Emoji characters like 🤖🧠💭💡🔮🎯 etc. for icons. Use lucide-react.",
+    "Every interaction needs micro-animations - hover states, transitions. Static = dead.",
+    "Use 2-3x more spacing than feels comfortable. Cramped designs look cheap."
+  ]
+}

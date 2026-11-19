@@ -1,0 +1,26 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "NAVIFY: Run Live Real-Time Assistant",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/run_live.py",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "NAVIFY: Run Unit Tests",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "unittest",
+            "args": [
+                "discover",
+                "-s",
+                "tests",
+                "-v"
+            ],
+            "console": "integratedTerminal"
+        }
+    ]
+}

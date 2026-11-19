@@ -1,0 +1,14 @@
+# NAVIFY Edge AI Python Dependencies
+# Target: Raspberry Pi OS 64-bit (Debian Bookworm)
+
+# Computer Vision & Deep Learning (on Pi)
+ultralytics>=8.3.0
+opencv-python-headless>=4.9.0
+numpy>=1.26.0
+
+# Hardware GPIO & I2C (on Pi)
+RPi.GPIO>=0.7.1; platform_system == "Linux"
+smbus2>=0.4.3; platform_system == "Linux"
+
+# Audio & Offline Text-To-Speech
+pyttsx3>=2.90

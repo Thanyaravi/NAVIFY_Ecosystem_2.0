@@ -1,0 +1,151 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300..800;1,14..32,400..600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    --background: 0 0% 100%;
+    --foreground: 222 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+    --primary: 243 75% 59%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222 47% 11%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
+    --accent: 226 100% 97%;
+    --accent-foreground: 243 75% 59%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 243 75% 59%;
+    --radius: 1rem;
+}
+
+.dark {
+    --background: 222 47% 7%;
+    --foreground: 210 40% 96%;
+    --card: 222 40% 11%;
+    --card-foreground: 210 40% 96%;
+    --popover: 222 40% 11%;
+    --popover-foreground: 210 40% 96%;
+    --primary: 243 75% 66%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 217 33% 17%;
+    --secondary-foreground: 210 40% 96%;
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 217 33% 17%;
+    --accent-foreground: 210 40% 96%;
+    --border: 217 33% 20%;
+    --input: 217 33% 20%;
+    --ring: 243 75% 66%;
+}
+
+* {
+    border-color: hsl(var(--border));
+}
+
+html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+    margin: 0;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: hsl(var(--foreground));
+    background: #F8FAFC;
+    transition: background-color 0.5s ease;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+}
+
+.dark body {
+    background: #070b16;
+}
+
+::selection {
+    background: rgba(99, 102, 241, 0.18);
+    color: #312e81;
+}
+.dark ::selection {
+    background: rgba(129, 140, 248, 0.35);
+    color: #e0e7ff;
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: rgba(148, 163, 184, 0.35);
+    border-radius: 9999px;
+    border: 3px solid transparent;
+    background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(100, 116, 139, 0.5);
+    background-clip: content-box;
+}
+.dark ::-webkit-scrollbar-thumb {
+    background: rgba(71, 85, 105, 0.5);
+    background-clip: content-box;
+}
+
+@keyframes float-blob {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(40px, -30px) scale(1.08); }
+    66% { transform: translate(-30px, 25px) scale(0.94); }
+}
+.animate-blob {
+    animation: float-blob 16s ease-in-out infinite;
+}
+
+@keyframes soft-pulse {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 0.9; }
+}
+.animate-soft-pulse {
+    animation: soft-pulse 3s ease-in-out infinite;
+}
+
+/* Glass surfaces (auto-adapt to theme) */
+.glass {
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    box-shadow: 0 8px 32px rgba(15, 23, 42, 0.05);
+    transition: background-color 0.4s ease, border-color 0.4s ease;
+}
+.dark .glass {
+    background: rgba(22, 30, 48, 0.55);
+    border: 1px solid rgba(148, 163, 184, 0.12);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.glass-strong {
+    background: rgba(255, 255, 255, 0.78);
+    backdrop-filter: blur(32px);
+    -webkit-backdrop-filter: blur(32px);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow: 0 12px 48px rgba(15, 23, 42, 0.08);
+    transition: background-color 0.4s ease, border-color 0.4s ease;
+}
+.dark .glass-strong {
+    background: rgba(20, 28, 46, 0.72);
+    border: 1px solid rgba(148, 163, 184, 0.14);
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.45);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .animate-blob, .animate-soft-pulse { animation: none; }
+}

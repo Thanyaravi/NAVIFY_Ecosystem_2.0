@@ -1,0 +1,35 @@
+# Virtual Environment
+.venv/
+venv/
+ENV/
+env/
+
+# Node dependencies & builds
+node_modules/
+**/node_modules/
+build/
+**/build/
+.next/
+out/
+
+# Python cache & artifacts
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+
+# Databases & local stores
+*.db
+*.sqlite3
+navify_local.db
+
+# Environment variables
+.env.local
+.env.*.local
+
+# IDE & OS
+.DS_Store
+Thumbs.db
+*.swp

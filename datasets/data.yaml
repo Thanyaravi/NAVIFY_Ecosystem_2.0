@@ -1,0 +1,51 @@
+# NAVIFY Expanded YOLOv11 Dataset Configuration
+# Categorized into SAFE (Positive) and UNSAFE (Negative) Classes
+path: ./navify_dataset
+train: images/train
+val: images/val
+test: images/test
+
+names:
+  # SAFE / POSITIVE CLASSES (0-11)
+  0: door_open
+  1: door_closed
+  2: tactile_paving
+  3: handrail
+  4: elevator_door
+  5: crosswalk_zebra
+  6: ramp_accessible
+  7: empty_seat_bench
+  8: reception_counter
+  9: exit_sign
+  10: restroom_sign
+  11: clear_pathway
+
+  # UNSAFE / NEGATIVE CLASSES (12-35)
+  12: stairs_down
+  13: stairs_up
+  14: pothole_trench
+  15: overhead_obstacle
+  16: construction_barrier
+  17: vehicle_moving
+  18: vehicle_parked
+  19: bicycle_scooter
+  20: person_pedestrian
+  21: person_crowd
+  22: chair
+  23: table_desk
+  24: couch_sofa
+  25: pole_pillar
+  26: curb_step
+  27: backpack_floor
+  28: luggage_suitcase
+  29: bottle_spill_hazard
+  30: sign_board_a_frame
+  31: wall_dead_end
+  32: shopping_cart
+  33: trash_bin_obstacle
+  34: bed_frame
+  35: open_window_head_level
+
+metadata:
+  project: NAVIFY Smart Assistive Navigation Ecosystem
+  taxonomy_version: 2.0 (Dual-Mode Safe/Unsafe Classification)
