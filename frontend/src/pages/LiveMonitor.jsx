@@ -7,9 +7,10 @@ import { StatusPill } from "@/components/StatusPill";
 import { useObjectDetection } from "@/hooks/useObjectDetection";
 import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
+import { liveDetections } from "@/lib/mockData";
 
 export default function LiveMonitor() {
-  const [source, setSource] = useState("cane"); // cane | mobile
+  const [source, setSource] = useState("mobile"); // cane | mobile
   const [active, setActive] = useState(false);
   const [live, setLive] = useState([]);
   const [loggedCount, setLoggedCount] = useState(0);
@@ -295,7 +296,7 @@ export default function LiveMonitor() {
             <h3 className="mb-5 text-lg font-semibold tracking-tight text-slate-900 dark:text-white">
               Detected Objects
             </h3>
-            {live.length === 0 ? (
+            {((live.length ? live : (active ? [] : liveDetections)).length === 0) ? (
               <div className="flex h-40 flex-col items-center justify-center text-center">
                 <ScanEye className="h-8 w-8 text-slate-300 dark:text-slate-600" />
                 <p className="mt-3 text-sm text-slate-400 dark:text-slate-500">
@@ -304,7 +305,7 @@ export default function LiveMonitor() {
               </div>
             ) : (
               <div className="space-y-3">
-                {live.map((d) => (
+                {(live.length ? live : (active ? [] : liveDetections)).map((d) => (
                   <div
                     key={d.label}
                     className="rounded-2xl border border-white/70 bg-white/50 p-4 dark:border-white/10 dark:bg-white/5"

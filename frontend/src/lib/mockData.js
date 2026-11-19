@@ -2,20 +2,19 @@
 // Department of CSE (AI & ML) - Sai Vidya Institute of Technology (SVIT)
 
 export const user = {
-  name: "Thanya C R",
+  name: "Thanya C Ravi",
   firstName: "Thanya",
   email: "thanyaravi02@gmail.com",
-  role: "Lead Researcher",
+  role: "User",
   institution: "Sai Vidya Institute of Technology",
   department: "CSE (AI & ML)",
-  avatar:
-    "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80",
+  avatar: "",
 };
 
 export const dashboardStats = [
   { id: "journey", label: "Journey Today", value: "2.4", unit: "km", trend: "+18%", trendUp: true, accent: "indigo" },
   { id: "battery", label: "Battery", value: "86", unit: "%", trend: "-4%", trendUp: false, accent: "emerald" },
-  { id: "detections", label: "AI Detections", value: "48", unit: "", trend: "+12", trendUp: true, accent: "blue" },
+  { id: "detections", label: "AI Detections", value: "33", unit: "", trend: "+0 today", trendUp: true, accent: "blue" },
   { id: "sos", label: "SOS Status", value: "Safe", unit: "", trend: "All clear", trendUp: true, accent: "emerald" },
 ];
 
@@ -37,11 +36,11 @@ export const hardwareStatus = [
 ];
 
 export const recentDetections = [
-  { id: 1, label: "Person", icon: "User", time: "2 min ago", confidence: 98 },
-  { id: 2, label: "Chair", icon: "Armchair", time: "6 min ago", confidence: 94 },
-  { id: 3, label: "Door", icon: "DoorOpen", time: "11 min ago", confidence: 91 },
-  { id: 4, label: "Stairs", icon: "Footprints", time: "18 min ago", confidence: 89 },
-  { id: 5, label: "Obstacle", icon: "TriangleAlert", time: "24 min ago", confidence: 87 },
+  { id: 1, label: "Person", icon: "User", time: "2 min ago", confidence: 98, created_at: new Date(Date.now() - 2 * 60000).toISOString() },
+  { id: 2, label: "Cell Phone", icon: "Smartphone", time: "5 min ago", confidence: 94, created_at: new Date(Date.now() - 5 * 60000).toISOString() },
+  { id: 3, label: "Chair", icon: "Armchair", time: "11 min ago", confidence: 91, created_at: new Date(Date.now() - 11 * 60000).toISOString() },
+  { id: 4, label: "Door", icon: "DoorOpen", time: "18 min ago", confidence: 89, created_at: new Date(Date.now() - 18 * 60000).toISOString() },
+  { id: 5, label: "Obstacle", icon: "TriangleAlert", time: "24 min ago", confidence: 87, created_at: new Date(Date.now() - 24 * 60000).toISOString() },
 ];
 
 export const deviceHealth = [
@@ -53,10 +52,10 @@ export const deviceHealth = [
 ];
 
 export const recentActivity = [
-  { id: 1, title: "Journey Started", detail: "Home → Central Park", time: "08:42 AM", icon: "Play", tone: "indigo" },
-  { id: 2, title: "Obstacle Detected", detail: "Low-hanging branch avoided", time: "08:51 AM", icon: "TriangleAlert", tone: "amber" },
+  { id: 1, title: "Journey Started", detail: "Campus → Block B", time: "08:42 AM", icon: "Play", tone: "indigo" },
+  { id: 2, title: "Obstacle Detected", detail: "Chair obstruction at 1.20m safely bypassed", time: "08:51 AM", icon: "TriangleAlert", tone: "amber" },
   { id: 3, title: "SOS Checked", detail: "Guardian confirmed safe", time: "09:15 AM", icon: "ShieldCheck", tone: "emerald" },
-  { id: 4, title: "Cloud Synced", detail: "48 detections uploaded", time: "09:30 AM", icon: "Cloud", tone: "blue" },
+  { id: 4, title: "Cloud Synced", detail: "33 detections recorded", time: "09:30 AM", icon: "Cloud", tone: "blue" },
 ];
 
 export const smartCane = {
@@ -81,17 +80,15 @@ export const smartCane = {
 };
 
 export const liveDetections = [
-  { id: 1, label: "Person", confidence: 98, box: "center" },
-  { id: 2, label: "Chair", confidence: 94, box: "left" },
-  { id: 3, label: "Backpack", confidence: 88, box: "right" },
-  { id: 4, label: "Door", confidence: 82, box: "far" },
+  { id: 1, label: "Cell Phone", confidence: 85, box: "left", proximity: "Close · On Your Left" },
+  { id: 2, label: "Person", confidence: 67, box: "center", proximity: "Very Close · Straight Ahead" },
 ];
 
 export const insights = {
   journey: [
-    { label: "Total Distance", value: "184 km", sub: "This month" },
-    { label: "Avg. Daily", value: "6.1 km", sub: "Last 30 days" },
-    { label: "Trips", value: "72", sub: "Completed" },
+    { label: "Total Distance", value: "9.5 km", sub: "All journeys" },
+    { label: "Avg. Daily", value: "1.4 km", sub: "Last 7 days" },
+    { label: "Trips", value: "4", sub: "Completed" },
     { label: "Active Hours", value: "48h", sub: "This month" },
   ],
   daily: [
@@ -110,46 +107,43 @@ export const insights = {
     { week: "W4", value: 460 },
   ],
   mostDetected: [
-    { label: "Person", count: 412, pct: 34 },
-    { label: "Chair", count: 268, pct: 22 },
-    { label: "Door", count: 194, pct: 16 },
-    { label: "Stairs", count: 142, pct: 12 },
-    { label: "Obstacle", count: 96, pct: 8 },
-    { label: "Vehicle", count: 74, pct: 8 },
+    { label: "Person", count: 18, pct: 64 },
+    { label: "Cell Phone", count: 2, pct: 7 },
+    { label: "Chair", count: 2, pct: 7 },
+    { label: "Door", count: 2, pct: 7 },
+    { label: "Vase", count: 2, pct: 7 },
+    { label: "Cat", count: 1, pct: 4 },
   ],
 };
 
 export const journeyHistory = [
-  { id: 1, date: "Jun 12, 2026", route: "Home → Office", distance: "3.2 km", duration: "42 min", detections: 24 },
-  { id: 2, date: "Jun 11, 2026", route: "Office → Cafe", distance: "1.1 km", duration: "16 min", detections: 9 },
-  { id: 3, date: "Jun 11, 2026", route: "Cafe → Home", distance: "2.8 km", duration: "38 min", detections: 18 },
-  { id: 4, date: "Jun 10, 2026", route: "Home → Park", distance: "2.4 km", duration: "31 min", detections: 21 },
-  { id: 5, date: "Jun 09, 2026", route: "Park → Market", distance: "1.6 km", duration: "22 min", detections: 14 },
+  { id: 1, date: "Aug 02, 2026", route: "Campus → Block B", distance: "3.2 km", duration: "42 min", detections: 18 },
+  { id: 2, date: "Jul 28, 2026", route: "Academic Corridor → Lab 4", distance: "1.1 km", duration: "16 min", detections: 5 },
+  { id: 3, date: "Jul 24, 2026", route: "Main Gate → Library", distance: "2.8 km", duration: "38 min", detections: 7 },
+  { id: 4, date: "Jul 19, 2026", route: "Lab 4 → Seminar Hall", distance: "2.4 km", duration: "31 min", detections: 3 },
 ];
 
 export const detectionHistory = [
-  { id: 1, object: "Person", time: "Jun 12, 09:12 AM", confidence: 98, action: "Alerted" },
-  { id: 2, object: "Stairs", time: "Jun 12, 09:05 AM", confidence: 91, action: "Warned" },
-  { id: 3, object: "Door", time: "Jun 12, 08:58 AM", confidence: 89, action: "Guided" },
-  { id: 4, object: "Obstacle", time: "Jun 12, 08:44 AM", confidence: 87, action: "Rerouted" },
-  { id: 5, object: "Chair", time: "Jun 12, 08:40 AM", confidence: 94, action: "Alerted" },
+  { id: 1, object: "Person", time: "Aug 02, 09:12 AM", confidence: 98, action: "Alerted" },
+  { id: 2, object: "Cell Phone", time: "Aug 02, 09:05 AM", confidence: 94, action: "Detected" },
+  { id: 3, object: "Chair", time: "Aug 02, 08:58 AM", confidence: 91, action: "Guided" },
+  { id: 4, object: "Door", time: "Aug 02, 08:44 AM", confidence: 89, action: "Rerouted" },
+  { id: 5, object: "Obstacle", time: "Aug 02, 08:40 AM", confidence: 87, action: "Warned" },
 ];
 
 export const emergencyContacts = [
-  { id: 1, name: "Priya Sharma", relation: "Daughter", phone: "+91 98••• ••210", primary: true },
-  { id: 2, name: "Dr. Mehta", relation: "Physician", phone: "+91 98••• ••554", primary: false },
-  { id: 3, name: "Rahul Verma", relation: "Neighbour", phone: "+91 99••• ••102", primary: false },
+  { id: 1, name: "Vikram Sir", relation: "Guide/Mentor", phone: "7875738893", email: "vikramadhithan.ac@saividya.ac.in", primary: true },
+  { id: 2, name: "Tejas P", relation: "Friend", phone: "9535829902", email: "tejas.p.23aiml@saividya.ac.in", primary: false },
 ];
 
 export const sosHistory = [
-  { id: 1, type: "Manual Trigger", status: "Resolved", time: "Jun 08, 2026 · 06:24 PM", location: "MG Road, Bengaluru" },
-  { id: 2, type: "Fall Detected", status: "Resolved", time: "May 29, 2026 · 11:02 AM", location: "Indiranagar, Bengaluru" },
-  { id: 3, type: "Manual Trigger", status: "False Alarm", time: "May 21, 2026 · 04:47 PM", location: "Koramangala, Bengaluru" },
+  { id: 1, type: "Manual Trigger", status: "Resolved", time: "Aug 02, 2026 · 04:29 PM", location: "MG Road, Bengaluru" },
+  { id: 2, type: "Fall Detected", status: "Resolved", time: "Jul 28, 2026 · 04:29 PM", location: "Indiranagar, Bengaluru" },
 ];
 
 export const currentLocation = {
-  label: "Indiranagar, Bengaluru",
-  coords: "12.9716° N, 77.6412° E",
-  accuracy: "±4 m",
+  label: "Current position",
+  coords: "13.06475°, 77.59545°",
+  accuracy: "±92 m",
   updated: "Just now",
 };

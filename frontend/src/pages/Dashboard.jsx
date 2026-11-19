@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import * as Icons from "lucide-react";
-import { ArrowUpRight, ArrowDownRight, Camera, TrendingUp, Loader2 } from "lucide-react";
+import { ArrowUpRight, ArrowDownRight, Camera, TrendingUp } from "lucide-react";
 import { GlassCard, fadeUp, stagger } from "@/components/GlassCard";
 import { StatusPill } from "@/components/StatusPill";
 import { useAuth } from "@/context/AuthContext";
@@ -43,7 +43,7 @@ const ACTIVITY_TONE = {
   blue: "bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400",
 };
 
-const DET_ICON = { Person: "User", Chair: "Armchair", Door: "DoorOpen", Stairs: "Footprints", Obstacle: "TriangleAlert", Vehicle: "Car" };
+const DET_ICON = { Person: "User", "Cell Phone": "Smartphone", Chair: "Armchair", Door: "DoorOpen", Stairs: "Footprints", Obstacle: "TriangleAlert", Vehicle: "Car" };
 
 const Icon = ({ name, ...props }) => {
   const C = Icons[name] || Icons.Circle;
@@ -51,6 +51,7 @@ const Icon = ({ name, ...props }) => {
 };
 
 const timeAgo = (iso) => {
+  if (!iso) return "Just now";
   const diff = (Date.now() - new Date(iso).getTime()) / 60000;
   if (diff < 1) return "Just now";
   if (diff < 60) return `${Math.round(diff)} min ago`;
@@ -65,8 +66,10 @@ export default function Dashboard() {
     stats: dashboardStats,
     statusPills: statusPills,
     hardware: hardwareStatus,
+    hardwareStatus: hardwareStatus,
     recentDetections: recentDetections,
     health: deviceHealth,
+    deviceHealth: deviceHealth,
   });
   const [detections, setDetections] = useState(recentDetections);
 
@@ -74,9 +77,19 @@ export default function Dashboard() {
     (async () => {
       try {
         const s = await api.get("/dashboard/summary");
-        if (s?.data) setSummary(s.data);
+        if (s?.data) {
+          setSummary({
+            stats: s.data.stats || dashboardStats,
+            statusPills: s.data.statusPills || statusPills,
+            hardware: s.data.hardware || s.data.hardwareStatus || hardwareStatus,
+            hardwareStatus: s.data.hardwareStatus || s.data.hardware || hardwareStatus,
+            recentDetections: s.data.recentDetections || recentDetections,
+            health: s.data.health || s.data.deviceHealth || deviceHealth,
+            deviceHealth: s.data.deviceHealth || s.data.health || deviceHealth,
+          });
+        }
       } catch {
-        /* use institutional defaults */
+        /* use defaults */
       }
       try {
         const d = await api.get("/detections", { params: { limit: 5 } });
@@ -88,13 +101,18 @@ export default function Dashboard() {
   }, []);
 
   const recentActivity = [
-    { id: 1, title: "Mobility Journey Active", detail: "SVIT Academic Block → Corridor B", time: "08:42 AM", icon: "Play", tone: "indigo" },
+    { id: 1, title: "Mobility Journey Active", detail: "Campus → Block B", time: "08:42 AM", icon: "Play", tone: "indigo" },
     { id: 2, title: "Obstacle Detected & Avoided", detail: "Chair obstruction at 1.20m safely bypassed", time: "08:51 AM", icon: "TriangleAlert", tone: "amber" },
     { id: 3, title: "CANIE Threat Scan", detail: "Drop-off and reflective surface checks clear", time: "09:15 AM", icon: "ShieldCheck", tone: "emerald" },
     { id: 4, title: "Telemetry Persisted", detail: `${detections.length} obstacle logs stored locally`, time: "09:30 AM", icon: "Cloud", tone: "blue" },
   ];
 
   const firstName = (user?.name || "Thanya").split(" ")[0];
+  const statsList = summary.stats || dashboardStats;
+  const pillsList = summary.statusPills || statusPills;
+  const hwList = summary.hardwareStatus || summary.hardware || hardwareStatus;
+  const healthList = summary.deviceHealth || summary.health || deviceHealth;
+  const detList = detections || recentDetections;
 
   return (
     <motion.div variants={stagger} initial="hidden" animate="show" className="space-y-8">
@@ -103,27 +121,27 @@ export default function Dashboard() {
           {greeting()}, {firstName}
         </p>
         <h1 className="mt-1 text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
-          NAVIFY 2.0 Assistive Console
+          NAVIFY Ecosystem Console
         </h1>
         <p className="mt-2 max-w-3xl text-sm font-medium text-slate-600 dark:text-slate-400">
-          Department of CSE (AI &amp; ML) · Sai Vidya Institute of Technology · Phase-II BCI786
+          Real-time AI-powered assistive navigation ecosystem.
         </p>
         <div className="mt-6 flex flex-wrap gap-3">
-          {summary.statusPills.map((p) => (
+          {pillsList.map((p) => (
             <StatusPill key={p.id} label={p.label} tone={p.tone} />
           ))}
         </div>
       </motion.section>
 
       <motion.section variants={stagger} className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {summary.stats.map((s) => {
+        {statsList.map((s) => {
           const TrendIcon = s.trendUp ? ArrowUpRight : ArrowDownRight;
           return (
             <motion.div key={s.id} variants={fadeUp}>
               <GlassCard hover className="p-6" data-testid={`stat-card-${s.id}`}>
                 <div className="flex items-start justify-between">
                   <p className="text-sm font-medium text-slate-500 dark:text-slate-400">{s.label}</p>
-                  <div className={cn("flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br", ACCENT[s.accent])}>
+                  <div className={cn("flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br", ACCENT[s.accent] || ACCENT.indigo)}>
                     <TrendingUp className="h-4 w-4" />
                   </div>
                 </div>
@@ -170,8 +188,8 @@ export default function Dashboard() {
           <GlassCard className="p-6" data-testid="dashboard-hardware-status">
             <h3 className="mb-4 text-lg font-semibold tracking-tight text-slate-900 dark:text-white">Smart Cane Status</h3>
             <div className="space-y-1">
-              {summary.hardwareStatus.map((h) => {
-                const tone = STATUS_TONE[h.status];
+              {hwList.map((h) => {
+                const tone = STATUS_TONE[h.status] || STATUS_TONE.online;
                 return (
                   <div key={h.id} className="flex items-center justify-between border-b border-slate-100 py-2.5 last:border-0 dark:border-white/5">
                     <div className="flex items-center gap-3">
@@ -196,12 +214,12 @@ export default function Dashboard() {
         <motion.div variants={fadeUp}>
           <GlassCard className="h-full p-6" data-testid="dashboard-recent-detections">
             <h3 className="mb-5 text-lg font-semibold tracking-tight text-slate-900 dark:text-white">Recent Detections</h3>
-            {detections.length === 0 ? (
+            {detList.length === 0 ? (
               <p className="py-8 text-center text-sm text-slate-400">No detections yet</p>
             ) : (
               <div className="relative space-y-4 pl-2">
                 <div className="absolute bottom-2 left-[19px] top-2 w-px bg-slate-100 dark:bg-white/10" />
-                {detections.map((d) => (
+                {detList.map((d) => (
                   <div key={d.id} className="relative flex items-center gap-3.5">
                     <div className="relative z-10 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full border border-indigo-100 bg-indigo-50 text-indigo-600 dark:border-indigo-500/20 dark:bg-indigo-500/10 dark:text-indigo-400">
                       <Icon name={DET_ICON[d.label] || "ScanEye"} className="h-4 w-4" />
@@ -224,14 +242,14 @@ export default function Dashboard() {
           <GlassCard className="h-full p-6" data-testid="dashboard-device-health">
             <h3 className="mb-5 text-lg font-semibold tracking-tight text-slate-900 dark:text-white">Device Health</h3>
             <div className="space-y-4">
-              {summary.deviceHealth.map((m) => (
+              {healthList.map((m) => (
                 <div key={m.id}>
                   <div className="mb-1.5 flex items-center justify-between text-sm">
                     <span className="font-medium text-slate-600 dark:text-slate-300">{m.label}</span>
                     <span className="font-semibold text-slate-800 dark:text-slate-100">{m.value}{m.suffix || "%"}</span>
                   </div>
                   <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-white/10">
-                    <motion.div initial={{ width: 0 }} animate={{ width: `${m.value}%` }} transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }} className={cn("h-full rounded-full", HEALTH_TONE[m.tone])} />
+                    <motion.div initial={{ width: 0 }} animate={{ width: `${m.value}%` }} transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }} className={cn("h-full rounded-full", HEALTH_TONE[m.tone] || "bg-indigo-500")} />
                   </div>
                 </div>
               ))}
@@ -245,7 +263,7 @@ export default function Dashboard() {
             <div className="space-y-4">
               {recentActivity.map((a) => (
                 <div key={a.id} className="flex gap-3.5">
-                  <div className={cn("flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl", ACTIVITY_TONE[a.tone])}>
+                  <div className={cn("flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl", ACTIVITY_TONE[a.tone] || ACTIVITY_TONE.indigo)}>
                     <Icon name={a.icon} className="h-4 w-4" />
                   </div>
                   <div className="min-w-0 flex-1">

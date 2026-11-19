@@ -17,6 +17,18 @@ export const AuthProvider = ({ children }) => {
       
       const token = getToken();
       if (!token) {
+        // Auto-provision default console session for standalone deployment
+        const defaultUser = {
+          name: "Thanya C Ravi",
+          email: "thanyaravi02@gmail.com",
+          role: "User",
+          institution: "Sai Vidya Institute of Technology",
+          department: "CSE (AI & ML)",
+          avatar: "",
+        };
+        setToken("navify_active_session");
+        setUser(defaultUser);
+        localStorage.setItem(LOCAL_USER_KEY, JSON.stringify(defaultUser));
         setLoading(false);
         return;
       }
