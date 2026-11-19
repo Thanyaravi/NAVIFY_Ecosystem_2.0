@@ -69,7 +69,8 @@
     "postinstall": "node -e \"try { require('fs').writeFileSync('node_modules/react-dev-utils/ForkTsCheckerWebpackPlugin.js', 'module.exports = class ForkTsCheckerWebpackPlugin { apply() {} };'); } catch(e){}\""
   },
   "overrides": {
-    "ajv": "^8.17.1"
+    "ajv": "^8.17.1",
+    "date-fns": "^3.6.0"
   },
   "browserslist": {
     "production": [
