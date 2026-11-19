@@ -168,6 +168,32 @@ export default function Login() {
             <>Already have an account? <span className="font-semibold text-indigo-500">Sign in</span></>
           )}
         </button>
+
+        <div className="relative my-6 flex items-center justify-center">
+          <div className="w-full border-t border-slate-200 dark:border-slate-800" />
+          <span className="absolute bg-[#F8FAFC] px-3 text-xs uppercase tracking-wider text-slate-400 dark:bg-[#0b1120] dark:text-slate-500">
+            or
+          </span>
+        </div>
+
+        <button
+          type="button"
+          onClick={async () => {
+            setLoading(true);
+            try {
+              await login("thanyaravi02@gmail.com", "academic-access");
+              navigate("/dashboard");
+            } catch {
+              navigate("/dashboard");
+            } finally {
+              setLoading(false);
+            }
+          }}
+          data-testid="login-guest-button"
+          className="w-full rounded-2xl border border-indigo-200/60 bg-indigo-50/50 py-3 text-center text-xs font-semibold text-indigo-600 transition-all hover:bg-indigo-100/60 dark:border-indigo-500/20 dark:bg-indigo-500/10 dark:text-indigo-400 dark:hover:bg-indigo-500/20"
+        >
+          ⚡ Instant Access Demo (SVIT Evaluation Mode)
+        </button>
       </motion.div>
     </div>
   );

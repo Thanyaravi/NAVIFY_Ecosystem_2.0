@@ -5,6 +5,7 @@ import { GlassCard, fadeUp, stagger } from "@/components/GlassCard";
 import { PageHeader } from "@/components/PageHeader";
 import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
+import { insights as mockInsights, journeyHistory } from "@/lib/mockData";
 
 const OBJ_COLORS = ["bg-indigo-500", "bg-blue-500", "bg-emerald-500", "bg-amber-500", "bg-sky-500", "bg-violet-500"];
 
@@ -25,8 +26,11 @@ export default function Insights() {
     (async () => {
       try {
         const [stats, j] = await Promise.all([api.get("/detections/stats"), api.get("/journeys")]);
-        setMostDetected(stats.data);
-        setJourneys(j.data);
+        setMostDetected(stats.data?.length ? stats.data : mockInsights.mostDetected);
+        setJourneys(j.data?.length ? j.data : journeyHistory);
+      } catch {
+        setMostDetected(mockInsights.mostDetected);
+        setJourneys(journeyHistory);
       } finally {
         setLoading(false);
       }

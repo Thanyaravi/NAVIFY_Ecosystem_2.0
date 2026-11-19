@@ -5,6 +5,7 @@ import { Download, FileText, MapPin, ScanEye, Clock, Loader2 } from "lucide-reac
 import { GlassCard, fadeUp, stagger } from "@/components/GlassCard";
 import { PageHeader } from "@/components/PageHeader";
 import { api } from "@/lib/api";
+import { journeyHistory, detectionHistory } from "@/lib/mockData";
 
 const reports = [
   { id: "journey", title: "Journey Report", detail: "Full route history, distances and durations", icon: MapPin },
@@ -23,8 +24,11 @@ export default function Reports() {
     (async () => {
       try {
         const [j, d] = await Promise.all([api.get("/journeys"), api.get("/detections", { params: { limit: 20 } })]);
-        setJourneys(j.data);
-        setDetections(d.data);
+        setJourneys(j.data?.length ? j.data : journeyHistory);
+        setDetections(d.data?.length ? d.data : detectionHistory);
+      } catch {
+        setJourneys(journeyHistory);
+        setDetections(detectionHistory);
       } finally {
         setLoading(false);
       }

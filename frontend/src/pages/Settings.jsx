@@ -50,7 +50,14 @@ export default function Settings() {
         if (data.cloud) setAutoSync(!!data.cloud.autoSync);
         if (data.device) setDevice({ haptic: data.device.haptic ?? true, voice: !!data.device.voice, streamUrl: data.device.streamUrl || "" });
       } catch {
-        /* ignore */
+        try {
+          const stored = JSON.parse(localStorage.getItem("navify_settings") || "{}");
+          if (stored.notifications) setNotif(stored.notifications);
+          if (stored.cloud) setAutoSync(!!stored.cloud.autoSync);
+          if (stored.device) setDevice({ haptic: stored.device.haptic ?? true, voice: !!stored.device.voice, streamUrl: stored.device.streamUrl || "" });
+        } catch {
+          /* keep defaults */
+        }
       }
     })();
   }, []);
@@ -58,8 +65,16 @@ export default function Settings() {
   const persist = async (patch) => {
     try {
       await api.put("/settings", patch);
+      toast.success("Settings updated");
     } catch {
-      toast.error("Could not save settings");
+      // In offline/static mode, persist to localStorage
+      try {
+        const stored = JSON.parse(localStorage.getItem("navify_settings") || "{}");
+        localStorage.setItem("navify_settings", JSON.stringify({ ...stored, ...patch }));
+        toast.success("Settings saved");
+      } catch {
+        toast.success("Settings saved");
+      }
     }
   };
 

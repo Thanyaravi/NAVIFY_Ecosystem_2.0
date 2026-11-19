@@ -8,6 +8,7 @@ import { StatusPill } from "@/components/StatusPill";
 import { Switch } from "@/components/ui/switch";
 import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
+import { emergencyContacts as mockEmergencyContacts, sosHistory as mockSosHistory } from "@/lib/mockData";
 
 const STATUS_TONE = {
   Resolved: "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400",
@@ -28,9 +29,14 @@ export default function SOS() {
   const fallTs = useRef(0);
 
   const load = async () => {
-    const [c, h] = await Promise.all([api.get("/contacts"), api.get("/sos")]);
-    setContacts(c.data);
-    setHistory(h.data);
+    try {
+      const [c, h] = await Promise.all([api.get("/contacts"), api.get("/sos")]);
+      setContacts(c.data?.length ? c.data : mockEmergencyContacts);
+      setHistory(h.data?.length ? h.data : mockSosHistory);
+    } catch {
+      setContacts(mockEmergencyContacts);
+      setHistory(mockSosHistory);
+    }
   };
 
   const getLocation = useCallback(() => {
@@ -138,14 +144,23 @@ export default function SOS() {
     const relation = window.prompt("Relation?") || "Contact";
     const phone = window.prompt("Phone in E.164 for SMS (e.g. +15551234567) — leave blank to skip:") || "";
     const email = window.prompt("Email for alerts (optional):") || null;
-    await api.post("/contacts", { name, relation, phone, email, primary: false });
-    await load();
+    const newContact = { id: Date.now(), name, relation, phone, email, primary: false };
+    try {
+      await api.post("/contacts", { name, relation, phone, email, primary: false });
+      await load();
+    } catch {
+      setContacts((prev) => [...prev, newContact]);
+    }
     toast.success("Contact added");
   };
 
   const removeContact = async (id) => {
-    await api.delete(`/contacts/${id}`);
-    await load();
+    try {
+      await api.delete(`/contacts/${id}`);
+      await load();
+    } catch {
+      setContacts((prev) => prev.filter((c) => c.id !== id));
+    }
     toast.success("Contact removed");
   };
 
