@@ -39,10 +39,9 @@ export default function LiveMonitor() {
 
   const speak = (items) => {
     if (!voiceRef.current || !items.length || !("speechSynthesis" in window)) return;
-    const phrase = items
-      .slice(0, 2)
-      .map((f) => `${f.label}${f.proximity ? ", " + f.proximity : ""}${f.position ? ", " + f.position : ""}`)
-      .join(". ");
+    const top = items[0];
+    const steps = Math.max(1, Math.min(5, Math.round((top.distance || 1.5) / 0.65)));
+    const phrase = `In ${steps} steps, ${top.label} ahead at ${top.distance ? top.distance.toFixed(1) + " meters" : "close range"}. Move carefully.`;
     const u = new SpeechSynthesisUtterance(phrase);
     u.rate = 1.05;
     window.speechSynthesis.cancel();

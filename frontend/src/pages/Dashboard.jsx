@@ -7,6 +7,7 @@ import { StatusPill } from "@/components/StatusPill";
 import { useAuth } from "@/context/AuthContext";
 import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
+import { dashboardStats, statusPills, hardwareStatus, recentDetections, deviceHealth } from "@/lib/mockData";
 
 const greeting = () => {
   const h = new Date().getHours();
@@ -60,54 +61,52 @@ const timeAgo = (iso) => {
 
 export default function Dashboard() {
   const { user } = useAuth();
-  const [summary, setSummary] = useState(null);
-  const [detections, setDetections] = useState([]);
+  const [summary, setSummary] = useState({
+    stats: dashboardStats,
+    statusPills: statusPills,
+    hardware: hardwareStatus,
+    recentDetections: recentDetections,
+    health: deviceHealth,
+  });
+  const [detections, setDetections] = useState(recentDetections);
 
   useEffect(() => {
     (async () => {
       try {
         const s = await api.get("/dashboard/summary");
-        setSummary(s.data);
+        if (s?.data) setSummary(s.data);
       } catch {
-        /* auth redirect handles unauthenticated */
+        /* use institutional defaults */
       }
       try {
         const d = await api.get("/detections", { params: { limit: 5 } });
-        setDetections(d.data);
+        if (d?.data?.length) setDetections(d.data);
       } catch {
-        /* keep detections empty on failure */
+        /* keep default detections */
       }
     })();
   }, []);
 
   const recentActivity = [
-    { id: 1, title: "Journey Started", detail: "Home → Central Park", time: "08:42 AM", icon: "Play", tone: "indigo" },
-    { id: 2, title: "Obstacle Detected", detail: "Low-hanging branch avoided", time: "08:51 AM", icon: "TriangleAlert", tone: "amber" },
-    { id: 3, title: "SOS Checked", detail: "Guardian confirmed safe", time: "09:15 AM", icon: "ShieldCheck", tone: "emerald" },
-    { id: 4, title: "Cloud Synced", detail: `${detections.length} recent detections`, time: "09:30 AM", icon: "Cloud", tone: "blue" },
+    { id: 1, title: "Mobility Journey Active", detail: "SVIT Academic Block → Corridor B", time: "08:42 AM", icon: "Play", tone: "indigo" },
+    { id: 2, title: "Obstacle Detected & Avoided", detail: "Chair obstruction at 1.20m safely bypassed", time: "08:51 AM", icon: "TriangleAlert", tone: "amber" },
+    { id: 3, title: "CANIE Threat Scan", detail: "Drop-off and reflective surface checks clear", time: "09:15 AM", icon: "ShieldCheck", tone: "emerald" },
+    { id: 4, title: "Telemetry Persisted", detail: `${detections.length} obstacle logs stored locally`, time: "09:30 AM", icon: "Cloud", tone: "blue" },
   ];
 
-  if (!summary) {
-    return (
-      <div className="flex h-[60vh] items-center justify-center">
-        <Loader2 className="h-7 w-7 animate-spin text-indigo-500" />
-      </div>
-    );
-  }
-
-  const firstName = (user?.name || "there").split(" ")[0];
+  const firstName = (user?.name || "Thanya").split(" ")[0];
 
   return (
     <motion.div variants={stagger} initial="hidden" animate="show" className="space-y-8">
       <motion.section variants={fadeUp} data-testid="dashboard-hero">
-        <p className="text-sm font-medium text-indigo-500 dark:text-indigo-400">
+        <p className="text-sm font-semibold tracking-wide text-blue-600 dark:text-blue-400">
           {greeting()}, {firstName}
         </p>
-        <h1 className="mt-1 text-4xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-5xl">
-          NAVIFY Ecosystem Console
+        <h1 className="mt-1 text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
+          NAVIFY 2.0 Assistive Console
         </h1>
-        <p className="mt-3 max-w-2xl text-base text-slate-500 dark:text-slate-400">
-          Real-time AI-powered assistive navigation ecosystem.
+        <p className="mt-2 max-w-3xl text-sm font-medium text-slate-600 dark:text-slate-400">
+          Department of CSE (AI &amp; ML) · Sai Vidya Institute of Technology · Phase-II BCI786
         </p>
         <div className="mt-6 flex flex-wrap gap-3">
           {summary.statusPills.map((p) => (

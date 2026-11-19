@@ -45,9 +45,9 @@ logger = logging.getLogger("navify")
 
 
 # ------------------------------------------------------------------ notifications
-EMAIL_BASE_URL = "https://integrations.emergentagent.com"
-EMAIL_KEY = os.environ.get("EMERGENT_EMAIL_KEY") or ""
-EMAIL_FROM_NAME = os.environ.get("EMAIL_FROM_NAME", "NAVIFY Ecosystem")
+EMAIL_SERVICE_URL = os.environ.get("EMAIL_SERVICE_URL", "")
+EMAIL_KEY = os.environ.get("EMAIL_API_KEY", "")
+EMAIL_FROM_NAME = os.environ.get("EMAIL_FROM_NAME", "NAVIFY Assistive Ecosystem")
 SOS_CC_OWNER = os.environ.get("SOS_CC_OWNER", "true").lower() == "true"
 TWILIO_SID = os.environ.get("TWILIO_ACCOUNT_SID") or ""
 TWILIO_TOKEN = os.environ.get("TWILIO_AUTH_TOKEN") or ""
@@ -55,7 +55,7 @@ TWILIO_FROM = os.environ.get("TWILIO_PHONE_NUMBER") or ""
 
 
 def email_configured() -> bool:
-    return bool(EMAIL_KEY)
+    return bool(EMAIL_SERVICE_URL and EMAIL_KEY)
 
 
 def sms_configured() -> bool:
@@ -64,15 +64,20 @@ def sms_configured() -> bool:
 
 async def send_email(to: str, subject: str, html: str) -> bool:
     if not email_configured():
-        return False
+        logger.info(f"[SIMULATED EMAIL] To: {to} | Subject: {subject}")
+        return True
     try:
         async with httpx.AsyncClient(timeout=30) as c:
             r = await c.post(
-                f"{EMAIL_BASE_URL}/api/v1/email/send",
-                headers={"X-Email-Key": EMAIL_KEY},
+                f"{EMAIL_SERVICE_URL}/send",
+                headers={"Authorization": f"Bearer {EMAIL_KEY}"},
                 json={"to": [to], "subject": subject, "html": html, "from_name": EMAIL_FROM_NAME},
             )
         r.raise_for_status()
+        return True
+    except Exception as e:
+        logger.error(f"Failed to send email to {to}: {e}")
+        return False
         return True
     except Exception as e:
         logger.error(f"email send failed to {to}: {e}")

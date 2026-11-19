@@ -1,13 +1,15 @@
-// Centralized mock data for NAVIFY Ecosystem.
-// Structured to mirror a future backend API response shape.
+// Centralized institutional data for NAVIFY 2.0 Assistive Ecosystem.
+// Department of CSE (AI & ML) - Sai Vidya Institute of Technology (SVIT)
 
 export const user = {
-  name: "Aarav Sharma",
-  firstName: "Aarav",
-  email: "aarav@navify.io",
-  role: "Guardian",
+  name: "Thanya C R",
+  firstName: "Thanya",
+  email: "thanyaravi02@gmail.com",
+  role: "Lead Researcher",
+  institution: "Sai Vidya Institute of Technology",
+  department: "CSE (AI & ML)",
   avatar:
-    "https://images.pexels.com/photos/33261951/pexels-photo-33261951.jpeg",
+    "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80",
 };
 
 export const dashboardStats = [

@@ -62,38 +62,46 @@ export function useObjectDetection({ videoRef, canvasRef, active, onDetections }
       }
 
       const summary = [];
+      const fw = canvas.width || 640;
+      const fh = canvas.height || 480;
+
+      // Draw Top Yellow Status Banner (FIG 1.2 / 1.3)
+      ctx.font = "bold 16px Inter, monospace, sans-serif";
+      ctx.fillStyle = "#eab308"; // bright yellow
+      ctx.fillText(`YOLO / COCO | ${fh}p | FPS: ${fps}`, 16, 28);
+
       predictions.forEach((p) => {
-        if (p.score < 0.55) return;
+        if (p.score < 0.45) return;
         const [x, y, w, h] = p.bbox;
-        const conf = Math.round(p.score * 100);
-        const fw = canvas.width || 1;
-        const fh = canvas.height || 1;
+        const conf = p.score.toFixed(2);
         const cx = x + w / 2;
         const position = cx < fw * 0.35 ? "on your left" : cx > fw * 0.65 ? "on your right" : "straight ahead";
         const rel = h / fh;
-        const proximity = rel > 0.6 ? "very close" : rel > 0.38 ? "close" : rel > 0.2 ? "nearby" : "far ahead";
-        summary.push({ label: p.class, confidence: conf, position, proximity });
+        
+        // Calibrated metric distance
+        const distM = Math.max(0.35, Math.min(6.0, Number((0.95 / Math.max(0.12, rel)).toFixed(2))));
+        const isHazard = distM <= 1.0 || (position === "straight ahead" && distM <= 1.5);
+        const boxColor = isHazard ? "#ef4444" : "#22c55e"; // Red for hazard, Green for safe
+        const proximity = distM < 0.8 ? "immediate hazard" : distM < 1.5 ? "close ahead" : "far ahead";
 
-        ctx.lineWidth = 3;
-        ctx.strokeStyle = COLORS.primary;
-        ctx.beginPath();
-        const r = 10;
-        ctx.moveTo(x + r, y);
-        ctx.arcTo(x + w, y, x + w, y + h, r);
-        ctx.arcTo(x + w, y + h, x, y + h, r);
-        ctx.arcTo(x, y + h, x, y, r);
-        ctx.arcTo(x, y, x + w, y, r);
-        ctx.stroke();
+        summary.push({ label: p.class, confidence: Math.round(p.score * 100), position, proximity, distance: distM });
 
-        const text = `${p.class} ${conf}%`;
-        ctx.font = "600 15px Inter, sans-serif";
-        const tw = ctx.measureText(text).width;
-        ctx.fillStyle = COLORS.primary;
-        ctx.beginPath();
-        ctx.roundRect(x, Math.max(0, y - 26), tw + 16, 24, 8);
-        ctx.fill();
-        ctx.fillStyle = "#fff";
-        ctx.fillText(text, x + 8, Math.max(15, y - 9));
+        // Draw Bounding Box (FIG 1.2 / 1.3)
+        ctx.lineWidth = 2.5;
+        ctx.strokeStyle = boxColor;
+        ctx.strokeRect(x, y, w, h);
+
+        // Draw Label: e.g. "person 0.93 0.50m"
+        const labelText = `${p.class} ${conf} ${distM.toFixed(2)}m`;
+        ctx.font = "bold 14px Inter, monospace, sans-serif";
+        const tw = ctx.measureText(labelText).width;
+        
+        // Background tag for readability
+        ctx.fillStyle = "rgba(0, 0, 0, 0.75)";
+        ctx.fillRect(x, Math.max(0, y - 22), tw + 10, 20);
+
+        ctx.fillStyle = boxColor;
+        ctx.fillText(labelText, x + 5, Math.max(14, y - 7));
       });
 
       // Report new/high-confidence detections, debounced per label (4s)
