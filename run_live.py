@@ -1,18 +1,20 @@
-"""NAVIFY Real-Time Live Assistant (VS Code Entry Point)
-Run this file directly in VS Code by clicking the Play (▷) button at the top-right.
+"""NAVIFY Real-Time Live Detection Software
+Based on BCI586 Research Paper:
+'Real-Time Indoor Object Detection System for the Visually Impaired Using YOLOv11-M'
+Department of CSE (AI & ML) - Sai Vidya Institute of Technology (SVIT)
 
-Features:
-- Opens your real physical laptop webcam
-- Performs live YOLOv11 object detection
-- Dynamically estimates distance from live camera geometry
-- Context-Aware Navigation Intelligence Engine (CANIE) analyzes walking path
-- Speaks actionable guidance out loud via your speakers/headphones
-- Press 's' to trigger an Emergency SOS test
-- Press 'q' or 'ESC' to stop
+100% Standalone Detection Software:
+- Directly connects to your live physical camera / webcam
+- Runs real-time YOLOv11 object detection
+- Computes metric distance estimation (0.50m, 1.25m, etc.)
+- Performs Reflective Surface & Glare Detection (Texture Analysis - FIG 1.1)
+- Speaks natural step-based voice guidance via your speakers/headphones
+- Zero localhost dependencies: runs completely self-contained on your device
 """
 
 import os
 import sys
+import argparse
 from pathlib import Path
 
 # Ensure workspace root is in Python sys.path
@@ -22,16 +24,37 @@ if str(ROOT_DIR) not in sys.path:
 
 from edge.main import NavifyEdgeApplication
 
-def main():
-    print("=" * 65)
-    print("   NAVIFY Real-Time Edge AI Assistant (Live Camera Mode)   ")
-    print("   Press 'q' in the camera window to quit.                 ")
-    print("   Press 's' in the camera window to trigger SOS.          ")
-    print("=" * 65)
 
-    # Initialize live application using real webcam and on-screen HUD window
-    app = NavifyEdgeApplication(camera_index=0, show_gui=True)
-    app.start()
+def main():
+    parser = argparse.ArgumentParser(description="NAVIFY Real-Time Assistive Vision Software")
+    parser.add_argument("--camera", type=int, default=0, help="Camera device index (default: 0)")
+    parser.add_argument("--video", type=str, default=None, help="Optional path to a test video file")
+    parser.add_argument("--headless", action="store_true", help="Run without opening visual HUD window")
+    parser.add_argument("--test-cycles", type=int, default=None, help="Run a fixed number of cycles and exit")
+    parser.add_argument("--test-sos", action="store_true", help="Trigger a test SOS alert")
+    args = parser.parse_args()
+
+    print("=" * 70)
+    print("   NAVIFY Real-Time Assistive Vision System (YOLOv11-M)   ")
+    print("   Department of CSE (AI & ML) - SVIT                      ")
+    print("   [Q] / [ESC] : Quit window                              ")
+    print("   [S]         : Trigger Emergency SOS                    ")
+    print("=" * 70)
+
+    # Initialize live detection application (Zero localhost dependency)
+    app = NavifyEdgeApplication(
+        camera_index=args.camera,
+        video_path=args.video,
+        show_gui=not args.headless
+    )
+
+    if args.test_sos:
+        import time
+        time.sleep(1.0)
+        app.sos_coord.handle_sos_trigger("CLI_TEST_TRIGGER")
+
+    app.start(max_iterations=args.test_cycles)
+
 
 if __name__ == "__main__":
     main()
