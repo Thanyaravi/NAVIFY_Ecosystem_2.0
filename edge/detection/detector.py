@@ -29,6 +29,7 @@ class ObjectDetector:
         self.target_classes = set(raw_targets) if raw_targets else set()
         self.model = None
         self.backend = "none"
+        self.model_display_tag = "COCO (fallback)"
 
         self._load_model(model_path)
 
@@ -59,8 +60,12 @@ class ObjectDetector:
             from ultralytics import YOLO
             self.model = YOLO(found_path)
             self.backend = "ultralytics"
-            logger.info("REAL-TIME YOLO Model loaded successfully from '%s' (%d classes)", 
-                        found_path, len(self.model.names))
+            if len(self.model.names) == 80:
+                self.model_display_tag = "COCO (fallback)"
+            else:
+                self.model_display_tag = "YOLOv11-M"
+            logger.info("REAL-TIME YOLO Model loaded successfully from '%s' (%d classes) [%s]", 
+                        found_path, len(self.model.names), self.model_display_tag)
             return
         except Exception as e:
             logger.error("Failed to load Ultralytics YOLO model: %s", e)

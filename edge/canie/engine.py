@@ -42,11 +42,29 @@ class CANIEEngine:
         m = round(distance_cm / 100.0, 1)
         return f"approximately {m} metres away"
 
-    def process(self, scene: FusedScene) -> Optional[NavigationDecision]:
+    def process(self, scene: FusedScene, reflective_result=None) -> Optional[NavigationDecision]:
         """
-        Executes dual-mode positive/negative contextual analysis.
+        Executes dual-mode positive/negative contextual analysis including
+        Reflective Surface Detection (FIG 1.1 Architecture).
         """
-        # 0. Check IMU Tilt/Fall Alarm
+        # 0. Check Reflective Surface / Glare Hazard (FIG 1.1 Architecture)
+        if reflective_result and getattr(reflective_result, "is_reflective", False):
+            ref_msg = getattr(reflective_result, "primary_warning", None) or "Reflective surface detected ahead"
+            if self.suppressor.should_announce("reflective_surface", "CENTER", Priority.HIGH, 150.0):
+                self.suppressor.mark_announced("reflective_surface", "CENTER", Priority.HIGH, 150.0)
+                return NavigationDecision(
+                    priority=Priority.HIGH,
+                    safety_mode="REFLECTIVE",
+                    object_name="reflective_surface",
+                    distance_cm=150.0,
+                    corridor_state="HAZARDOUS",
+                    avoidance_direction="CAUTION",
+                    steps_estimate=2,
+                    spoken_message=f"In 2 steps, {ref_msg.lower()}. Move carefully.",
+                    should_speak=True
+                )
+
+        # 1. Check IMU Tilt/Fall Alarm
         if scene.imu_state.get("tilt_warning", False):
             msg = "Cane is excessively tilted. Please check cane alignment."
             if self.suppressor.should_announce("tilt", "CENTER", Priority.CRITICAL, None):
@@ -167,19 +185,22 @@ class CANIEEngine:
             else:
                 avoidance_dir = "STOP"
 
+            # Compute step estimate from distance (Appendix B & Section 4.6)
+            dist_m = (hazard_dist / 100.0) if hazard_dist else 1.5
+            calc_steps = max(1, min(6, int(round((hazard_dist or 150.0) / self.step_length_cm))))
+
             # Formulate compound or standard avoidance guidance
             if target_waypoint and avoidance_dir in ("LEFT", "RIGHT"):
                 wp_name = target_waypoint.class_name.replace("_", " ")
-                msg = (f"A {hazard_name.replace('_', ' ')} is {hazard_dist_str} obstructing your path, "
-                       f"but a {wp_name} is visible to your {avoidance_dir.lower()}. "
-                       f"Move {steps} steps {avoidance_dir.lower()} toward the {wp_name}.")
+                msg = (f"In {calc_steps} steps, {hazard_name.replace('_', ' ')} is ahead at {dist_m:.2f} meters obstructing path. "
+                       f"{wp_name.capitalize()} is visible to your {avoidance_dir.lower()}. Move {calc_steps} steps {avoidance_dir.lower()} toward the {wp_name}.")
                 mode = "COMPOUND_DETOUR"
             elif avoidance_dir in ("LEFT", "RIGHT"):
-                msg = (f"A {hazard_name.replace('_', ' ')} is detected {hazard_dist_str}, obstructing your path. "
-                       f"The {avoidance_dir.lower()} side is clear. Move {steps} steps {avoidance_dir.lower()} to avoid it.")
+                msg = (f"In {calc_steps} steps, {hazard_name.replace('_', ' ')} is ahead at {dist_m:.2f} meters obstructing path. "
+                       f"Clear path on your {avoidance_dir.lower()}. Move {calc_steps} steps {avoidance_dir.lower()} to avoid it.")
                 mode = "UNSAFE_HAZARD"
             else:
-                msg = f"Path obstructed by {hazard_name.replace('_', ' ')} {hazard_dist_str}. Side clearance uncertain. Please stop and feel with your cane."
+                msg = f"In {calc_steps} steps, path blocked by {hazard_name.replace('_', ' ')} at {dist_m:.2f} meters. Stop and sweep with cane."
                 mode = "UNSAFE_HAZARD"
 
             priority = Priority.HIGH

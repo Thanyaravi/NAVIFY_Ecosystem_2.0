@@ -33,6 +33,7 @@ from edge.sensors.sos_button import SOSButton
 from edge.sensors.imu import MPU6050Sensor
 from edge.camera.camera_service import CameraService
 from edge.detection.detector import ObjectDetector
+from edge.detection.reflective import ReflectiveSurfaceDetector
 from edge.fusion.sensor_fusion import SensorFusionEngine
 from edge.canie.engine import CANIEEngine
 from edge.integration.cloud_sync import CloudSyncService
@@ -73,6 +74,9 @@ class NavifyEdgeApplication:
         logger.info("Loading REAL-TIME YOLOv11 Neural Model...")
         self.detector = ObjectDetector()
 
+        # Reflective Surface & Glare Detector (FIG 1.1 Architecture)
+        self.reflective_detector = ReflectiveSurfaceDetector()
+
         # 6. Fusion & CANIE Decision Engine
         logger.info("Initializing Sensor Fusion and Dual-Mode CANIE Reasoning Engine...")
         self.fusion = SensorFusionEngine()
@@ -85,63 +89,86 @@ class NavifyEdgeApplication:
         # System start prompt
         self.voice.speak("NAVIFY Navigation system active. Ready.", priority_level=1)
 
-    def draw_hud(self, frame, detections, scene, decision, fps: float):
-        """Draws the real-time assistive HUD on the video frame."""
+    def draw_hud(self, frame, detections, scene, decision, reflective_res, fps: float):
+        """
+        Draws the real-time assistive HUD matching FIG 1.2 and FIG 1.3
+        of the BCI586 Research Paper.
+        """
         h, w = frame.shape[:2]
 
-        # Draw Zone Partition Lines (LEFT | CENTER WALKING PATH | RIGHT)
-        left_line_x = int(w * CORRIDOR_CONFIG["LEFT_MAX_X"])
-        right_line_x = int(w * CORRIDOR_CONFIG["RIGHT_MIN_X"])
+        # 1. TOP HEADER BANNER (Exact Style from FIG 1.2 & FIG 1.3)
+        # Bold Yellow text: e.g. "COCO (fallback) | 480p | FPS: 42.5" or "YOLOv11-M | 480p | FPS: 50.3"
+        model_tag = getattr(self.detector, "model_display_tag", "YOLOv11-M")
+        res_tag = f"{h}p" if h in (480, 720, 1080) else f"{w}x{h}"
+        header_text = f"{model_tag} | {res_tag} | FPS: {fps:.1f}"
 
-        # Semi-transparent overlay for center walking corridor
-        overlay = frame.copy()
-        cv2.rectangle(overlay, (left_line_x, 0), (right_line_x, h), (40, 40, 20), -1)
-        cv2.addWeighted(overlay, 0.25, frame, 0.75, 0, frame)
+        # Draw top yellow banner with slight black shadow for contrast readability
+        cv2.putText(frame, header_text, (22, 37), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 0, 0), 3)
+        cv2.putText(frame, header_text, (20, 35), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 255), 2)
 
-        # Draw guideline borders
-        cv2.line(frame, (left_line_x, 0), (left_line_x, h), (0, 255, 255), 2)
-        cv2.line(frame, (right_line_x, 0), (right_line_x, h), (0, 255, 255), 2)
-
-        # Zone Labels
-        cv2.putText(frame, "LEFT ZONE", (15, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (200, 200, 200), 2)
-        cv2.putText(frame, "WALKING CORRIDOR", (left_line_x + 15, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 255), 2)
-        cv2.putText(frame, "RIGHT ZONE", (right_line_x + 15, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (200, 200, 200), 2)
-
-        # Draw Detections & Distances
+        # 2. BOUNDING BOXES (Exact formatting from FIG 1.2 & 1.3: label conf dist_m)
         for det in detections:
             x1 = int(det.bbox[0] * w)
             y1 = int(det.bbox[1] * h)
             x2 = int(det.bbox[2] * w)
             y2 = int(det.bbox[3] * h)
 
-            # Match obstacle distance
+            # Match obstacle distance from fusion or monocular geometry
             matching_obs = next((o for o in scene.obstacles if o.class_name == det.class_name), None)
-            dist_val = matching_obs.distance_cm if matching_obs else None
-            dist_str = f"{dist_val:.1f}cm" if dist_val else ""
+            dist_cm = matching_obs.distance_cm if matching_obs else self.ultrasonic.estimate_distance_from_bbox(det.class_name, det.height, h)
+            dist_m = max(0.2, (dist_cm / 100.0) if dist_cm else 1.50)
 
-            # Color coding: Red for corridor hazard, Green for safe/clear, Orange for peripheral
-            color = (0, 0, 255) if (matching_obs and matching_obs.is_in_walking_path) else (0, 255, 0)
+            # Color coding from Paper:
+            # RED (0, 0, 255) for close/danger obstacles (< 1.0m or person/hazard in path)
+            # GREEN (0, 255, 0) for safe distance obstacles (>= 1.0m)
+            is_close_hazard = (dist_m <= 1.0) or (matching_obs and matching_obs.is_in_walking_path and dist_m <= 1.4)
+            box_color = (0, 0, 255) if is_close_hazard else (0, 255, 0)
 
-            cv2.rectangle(frame, (x1, y1), (x2, y2), color, 2)
-            label = f"{det.class_name} ({int(det.confidence*100)}%) {dist_str}"
-            cv2.rectangle(frame, (x1, max(0, y1 - 25)), (x1 + len(label) * 10, y1), color, -1)
-            cv2.putText(frame, label, (x1 + 3, max(15, y1 - 6)), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 0), 2)
+            # Draw crisp bounding box
+            cv2.rectangle(frame, (x1, y1), (x2, y2), box_color, 2)
 
-        # Header Information Banner
-        cv2.rectangle(frame, (0, h - 85), (w, h), (20, 20, 20), -1)
+            # Label text matching report: e.g. "person 0.93 0.50m"
+            label_text = f"{det.class_name} {det.confidence:.2f} {dist_m:.2f}m"
 
-        # Spoken CANIE Advice on Banner
-        if decision and decision.spoken_message:
-            cv2.putText(frame, f"CANIE: {decision.spoken_message[:65]}...", (15, h - 50),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.55, (0, 255, 255), 2)
+            # Draw label directly above bounding box in matching color with subtle shadow
+            label_y = max(22, y1 - 8)
+            cv2.putText(frame, label_text, (x1 + 1, label_y + 1), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (0, 0, 0), 2)
+            cv2.putText(frame, label_text, (x1, label_y), cv2.FONT_HERSHEY_SIMPLEX, 0.55, box_color, 2)
+
+        # 3. REFLECTIVE SURFACE DETECTION OVERLAYS (FIG 1.1 Architecture)
+        if reflective_res and getattr(reflective_res, "is_reflective", False):
+            for reg in reflective_res.regions:
+                rx1, ry1, rx2, ry2 = reg.bbox
+                cyan_color = (255, 255, 0)
+                cv2.rectangle(frame, (rx1, ry1), (rx2, ry2), cyan_color, 2)
+                ref_label = f"Reflective Surface {reg.confidence:.2f} 1.50m"
+                cv2.putText(frame, ref_label, (rx1, max(22, ry1 - 8)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, cyan_color, 2)
+
+        # 4. BOTTOM GUIDANCE & SAFETY STATUS BAR
+        overlay = frame.copy()
+        cv2.rectangle(overlay, (0, h - 55), (w, h), (15, 15, 15), -1)
+        cv2.addWeighted(overlay, 0.65, frame, 0.35, 0, frame)
+
+        # Safety State Indicator (FIG 1.1: Safe / Unsafe / Reflective)
+        safety_mode = decision.safety_mode if decision else "CLEAR"
+        if safety_mode == "REFLECTIVE":
+            safety_badge = "STATE: REFLECTIVE"
+            badge_color = (255, 255, 0)
+        elif safety_mode in ("UNSAFE_HAZARD", "HAZARDOUS"):
+            safety_badge = "STATE: UNSAFE"
+            badge_color = (0, 0, 255)
         else:
-            cv2.putText(frame, "CANIE: Path is clear. Continue forward.", (15, h - 50),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.55, (0, 255, 0), 2)
+            safety_badge = "STATE: SAFE"
+            badge_color = (0, 255, 0)
 
-        # Telemetry & Status Line
-        status_line = (f"FPS: {fps:.1f} | Left Clearance: {scene.left_clearance_cm:.0f}cm | "
-                       f"Right Clearance: {scene.right_clearance_cm:.0f}cm | [Q] Quit  [S] SOS")
-        cv2.putText(frame, status_line, (15, h - 18), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (220, 220, 220), 1)
+        cv2.putText(frame, safety_badge, (15, h - 25), cv2.FONT_HERSHEY_SIMPLEX, 0.55, badge_color, 2)
+
+        # Spoken Guidance Text
+        msg_text = decision.spoken_message if (decision and decision.spoken_message) else "Path is clear ahead."
+        cv2.putText(frame, f"| {msg_text[:65]}", (190, h - 25), cv2.FONT_HERSHEY_SIMPLEX, 0.48, (230, 230, 230), 1)
+
+        # Hotkeys
+        cv2.putText(frame, "[Q] Quit  [S] SOS", (w - 140, h - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.38, (160, 160, 160), 1)
 
         return frame
 
@@ -158,23 +185,26 @@ class NavifyEdgeApplication:
         # 2. Real-Time YOLO Inference
         detections = self.detector.detect(frame)
 
-        # 3. Read Dual Range Data (Hardware GPIO on Pi, or Real-Time Optical Geometry on Laptop)
+        # 3. Reflective Surface Detection (Texture & Glare Analysis - FIG 1.1)
+        reflective_res = self.reflective_detector.analyze(frame)
+
+        # 4. Read Dual Range Data (Hardware GPIO on Pi, or Real-Time Optical Geometry on Laptop)
         ultrasonic_data = self.ultrasonic.read_coordinated_distances(live_detections=detections)
 
-        # 4. Read IMU Motion State
+        # 5. Read IMU Motion State
         imu_state = self.imu.read_motion_state()
 
-        # 5. Spatial Sensor Fusion
+        # 6. Spatial Sensor Fusion
         scene = self.fusion.fuse(detections, ultrasonic_data, imu_state)
 
-        # 6. CANIE Dual-Mode Contextual Decision Making
-        decision = self.canie.process(scene)
+        # 7. CANIE Dual-Mode Contextual Decision Making with Reflective Analysis
+        decision = self.canie.process(scene, reflective_result=reflective_res)
 
-        # 7. Deliver Spoken Voice Guidance
+        # 8. Deliver Spoken Voice Guidance
         if decision and decision.should_speak and decision.spoken_message:
             self.voice.speak(decision.spoken_message, priority_level=1)
 
-        # 8. Record Real Events to Local SQLite
+        # 9. Record Real Events to Local SQLite
         for det in detections:
             matching_obs = next((o for o in scene.obstacles if o.class_name == det.class_name), None)
             zone = matching_obs.zone if matching_obs else "UNKNOWN"
@@ -195,9 +225,9 @@ class NavifyEdgeApplication:
         elapsed = time.perf_counter() - start_time
         fps = round(1.0 / max(0.001, elapsed), 1)
 
-        # 9. Display Live Video HUD Window
+        # 10. Display Live Video HUD Window (FIG 1.2 & FIG 1.3 Output)
         if self.show_gui and frame is not None:
-            display_frame = self.draw_hud(frame.copy(), detections, scene, decision, fps)
+            display_frame = self.draw_hud(frame.copy(), detections, scene, decision, reflective_res, fps)
             cv2.imshow("NAVIFY Live Cane Vision (Real-Time HUD)", display_frame)
             key = cv2.waitKey(1) & 0xFF
             if key in (ord('q'), 27): # 'q' or ESC to exit
