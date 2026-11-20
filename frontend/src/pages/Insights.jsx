@@ -26,8 +26,8 @@ export default function Insights() {
     (async () => {
       try {
         const [stats, j] = await Promise.all([api.get("/detections/stats"), api.get("/journeys")]);
-        setMostDetected(stats.data?.length ? stats.data : mockInsights.mostDetected);
-        setJourneys(j.data?.length ? j.data : journeyHistory);
+        setMostDetected(Array.isArray(stats?.data) ? stats.data : mockInsights.mostDetected);
+        setJourneys(Array.isArray(j?.data) ? j.data : journeyHistory);
       } catch {
         setMostDetected(mockInsights.mostDetected);
         setJourneys(journeyHistory);

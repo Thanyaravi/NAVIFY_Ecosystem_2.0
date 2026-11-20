@@ -22,6 +22,20 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+api.interceptors.response.use(
+  (response) => {
+    // If Vercel rewrote an unknown API route to index.html (SPA fallback), treat it as an error
+    const ct = response.headers?.["content-type"] || "";
+    if (ct.includes("text/html") || (typeof response.data === "string" && response.data.trim().startsWith("<"))) {
+      const err = new Error("Static deployment: HTML received instead of JSON API response");
+      err.response = { status: 404, data: { detail: "Endpoint unavailable in static mode" } };
+      return Promise.reject(err);
+    }
+    return response;
+  },
+  (error) => Promise.reject(error)
+);
+
 export function formatApiError(detail) {
   if (detail == null) return "Something went wrong. Please try again.";
   if (typeof detail === "string") return detail;

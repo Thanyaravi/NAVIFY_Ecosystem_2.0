@@ -119,15 +119,12 @@ export default function Dashboard() {
     (async () => {
       try {
         const s = await api.get("/dashboard/summary");
-        if (s?.data) {
+        if (s?.data && typeof s.data === "object" && !Array.isArray(s.data)) {
           setSummary({
-            stats: s.data.stats || dashboardStats,
-            statusPills: s.data.statusPills || statusPills,
-            hardware: s.data.hardware || s.data.hardwareStatus || hardwareStatus,
-            hardwareStatus: s.data.hardwareStatus || s.data.hardware || hardwareStatus,
-            recentDetections: s.data.recentDetections || recentDetections,
-            health: s.data.health || s.data.deviceHealth || deviceHealth,
-            deviceHealth: s.data.deviceHealth || s.data.health || deviceHealth,
+            stats: Array.isArray(s.data.stats) ? s.data.stats : dashboardStats,
+            statusPills: Array.isArray(s.data.statusPills) ? s.data.statusPills : statusPills,
+            hardwareStatus: Array.isArray(s.data.hardwareStatus) ? s.data.hardwareStatus : hardwareStatus,
+            deviceHealth: Array.isArray(s.data.deviceHealth) ? s.data.deviceHealth : deviceHealth,
           });
         }
       } catch {
@@ -135,26 +132,30 @@ export default function Dashboard() {
       }
       try {
         const d = await api.get("/detections", { params: { limit: 5 } });
-        if (d?.data?.length) setDetections(d.data);
+        if (Array.isArray(d?.data)) setDetections(d.data);
       } catch {
         /* keep default detections */
       }
     })();
   }, []);
 
+  const firstName = (user?.name || "Thanya").split(" ")[0];
+  const statsList = Array.isArray(summary?.stats) ? summary.stats : dashboardStats;
+  const pillsList = Array.isArray(summary?.statusPills) ? summary.statusPills : statusPills;
+  const hwList = Array.isArray(summary?.hardwareStatus)
+    ? summary.hardwareStatus
+    : (Array.isArray(summary?.hardware) ? summary.hardware : hardwareStatus);
+  const healthList = Array.isArray(summary?.deviceHealth)
+    ? summary.deviceHealth
+    : (Array.isArray(summary?.health) ? summary.health : deviceHealth);
+  const detList = Array.isArray(detections) ? detections : recentDetections;
+
   const recentActivity = [
     { id: 1, title: "Mobility Journey Active", detail: "Campus → Block B", time: "08:42 AM", icon: "Play", tone: "indigo" },
     { id: 2, title: "Obstacle Detected & Avoided", detail: "Chair obstruction at 1.20m safely bypassed", time: "08:51 AM", icon: "TriangleAlert", tone: "amber" },
     { id: 3, title: "CANIE Threat Scan", detail: "Drop-off and reflective surface checks clear", time: "09:15 AM", icon: "ShieldCheck", tone: "emerald" },
-    { id: 4, title: "Telemetry Persisted", detail: `${detections.length} obstacle logs stored locally`, time: "09:30 AM", icon: "Cloud", tone: "blue" },
+    { id: 4, title: "Telemetry Persisted", detail: `${detList.length} obstacle logs stored locally`, time: "09:30 AM", icon: "Cloud", tone: "blue" },
   ];
-
-  const firstName = (user?.name || "Thanya").split(" ")[0];
-  const statsList = summary.stats || dashboardStats;
-  const pillsList = summary.statusPills || statusPills;
-  const hwList = summary.hardwareStatus || summary.hardware || hardwareStatus;
-  const healthList = summary.deviceHealth || summary.health || deviceHealth;
-  const detList = detections || recentDetections;
 
   return (
     <motion.div variants={stagger} initial="hidden" animate="show" className="space-y-8">

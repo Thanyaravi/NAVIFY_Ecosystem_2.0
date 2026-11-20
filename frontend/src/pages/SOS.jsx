@@ -31,8 +31,8 @@ export default function SOS() {
   const load = async () => {
     try {
       const [c, h] = await Promise.all([api.get("/contacts"), api.get("/sos")]);
-      setContacts(c.data?.length ? c.data : mockEmergencyContacts);
-      setHistory(h.data?.length ? h.data : mockSosHistory);
+      setContacts(Array.isArray(c?.data) ? c.data : mockEmergencyContacts);
+      setHistory(Array.isArray(h?.data) ? h.data : mockSosHistory);
     } catch {
       setContacts(mockEmergencyContacts);
       setHistory(mockSosHistory);

@@ -24,8 +24,8 @@ export default function Reports() {
     (async () => {
       try {
         const [j, d] = await Promise.all([api.get("/journeys"), api.get("/detections", { params: { limit: 20 } })]);
-        setJourneys(j.data?.length ? j.data : journeyHistory);
-        setDetections(d.data?.length ? d.data : detectionHistory);
+        setJourneys(Array.isArray(j?.data) ? j.data : journeyHistory);
+        setDetections(Array.isArray(d?.data) ? d.data : detectionHistory);
       } catch {
         setJourneys(journeyHistory);
         setDetections(detectionHistory);
