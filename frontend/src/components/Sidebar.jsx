@@ -52,43 +52,46 @@ export const Sidebar = () => {
         </div>
 
         <nav className="mt-6 flex flex-1 flex-col gap-1.5">
-          {NAV.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              data-testid={`nav-${item.label.toLowerCase().replace(/\s+/g, "-")}`}
-              className={({ isActive }) =>
-                cn(
-                  "group relative flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium transition-colors duration-200",
-                  isActive
-                    ? "text-indigo-700 dark:text-indigo-300"
-                    : "text-slate-500 hover:bg-white/60 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-white/5 dark:hover:text-white"
-                )
-              }
-            >
-              {({ isActive }) => (
-                <>
-                  {isActive && (
-                    <motion.div
-                      layoutId="nav-active"
-                      className="absolute inset-0 rounded-2xl border border-indigo-100/70 bg-white shadow-[0_4px_16px_rgba(99,102,241,0.10)] dark:border-indigo-400/20 dark:bg-indigo-500/15"
-                      transition={{ type: "spring", stiffness: 400, damping: 32 }}
-                    />
-                  )}
-                  <item.icon
-                    className={cn(
-                      "relative z-10 h-[18px] w-[18px] transition-colors",
-                      isActive
-                        ? "text-indigo-600 dark:text-indigo-300"
-                        : "text-slate-400 group-hover:text-slate-600 dark:text-slate-500 dark:group-hover:text-slate-300"
+          {NAV.map((item) => {
+            const ItemIcon = item.icon;
+            return (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                data-testid={`nav-${item.label.toLowerCase().replace(/\s+/g, "-")}`}
+                className={({ isActive }) =>
+                  cn(
+                    "group relative flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium transition-colors duration-200",
+                    isActive
+                      ? "text-indigo-700 dark:text-indigo-300"
+                      : "text-slate-500 hover:bg-white/60 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-white/5 dark:hover:text-white"
+                  )
+                }
+              >
+                {({ isActive }) => (
+                  <>
+                    {isActive && (
+                      <motion.div
+                        layoutId="nav-active"
+                        className="absolute inset-0 rounded-2xl border border-indigo-100/70 bg-white shadow-[0_4px_16px_rgba(99,102,241,0.10)] dark:border-indigo-400/20 dark:bg-indigo-500/15"
+                        transition={{ type: "spring", stiffness: 400, damping: 32 }}
+                      />
                     )}
-                    strokeWidth={2.1}
-                  />
-                  <span className="relative z-10">{item.label}</span>
-                </>
-              )}
-            </NavLink>
-          ))}
+                    <ItemIcon
+                      className={cn(
+                        "relative z-10 h-[18px] w-[18px] transition-colors",
+                        isActive
+                          ? "text-indigo-600 dark:text-indigo-300"
+                          : "text-slate-400 group-hover:text-slate-600 dark:text-slate-500 dark:group-hover:text-slate-300"
+                      )}
+                      strokeWidth={2.1}
+                    />
+                    <span className="relative z-10">{item.label}</span>
+                  </>
+                )}
+              </NavLink>
+            );
+          })}
         </nav>
 
         <div className="mt-4 flex items-center gap-3 rounded-2xl border border-white/70 bg-white/50 p-3 dark:border-white/10 dark:bg-white/5">

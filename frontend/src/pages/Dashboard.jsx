@@ -1,13 +1,60 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import * as Icons from "lucide-react";
-import { ArrowUpRight, ArrowDownRight, Camera, TrendingUp } from "lucide-react";
+import {
+  ArrowUpRight,
+  ArrowDownRight,
+  Camera,
+  TrendingUp,
+  Radar,
+  BatteryFull,
+  MapPin,
+  Volume2,
+  Cpu,
+  Cloud,
+  User,
+  Smartphone,
+  Armchair,
+  DoorOpen,
+  Footprints,
+  TriangleAlert,
+  Car,
+  ScanEye,
+  Play,
+  ShieldCheck,
+  Circle,
+} from "lucide-react";
 import { GlassCard, fadeUp, stagger } from "@/components/GlassCard";
 import { StatusPill } from "@/components/StatusPill";
 import { useAuth } from "@/context/AuthContext";
 import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { dashboardStats, statusPills, hardwareStatus, recentDetections, deviceHealth } from "@/lib/mockData";
+
+const ICON_MAP = {
+  Camera,
+  Radar,
+  BatteryFull,
+  MapPin,
+  Volume2,
+  Cpu,
+  Cloud,
+  User,
+  Smartphone,
+  Armchair,
+  DoorOpen,
+  Footprints,
+  TriangleAlert,
+  Car,
+  ScanEye,
+  Play,
+  ShieldCheck,
+  Circle,
+};
+
+const Icon = ({ name, ...props }) => {
+  const Component = ICON_MAP[name] || Circle;
+  return <Component {...props} />;
+};
 
 const greeting = () => {
   const h = new Date().getHours();
@@ -44,11 +91,6 @@ const ACTIVITY_TONE = {
 };
 
 const DET_ICON = { Person: "User", "Cell Phone": "Smartphone", Chair: "Armchair", Door: "DoorOpen", Stairs: "Footprints", Obstacle: "TriangleAlert", Vehicle: "Car" };
-
-const Icon = ({ name, ...props }) => {
-  const C = Icons[name] || Icons.Circle;
-  return <C {...props} />;
-};
 
 const timeAgo = (iso) => {
   if (!iso) return "Just now";
