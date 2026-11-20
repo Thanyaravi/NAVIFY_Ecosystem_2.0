@@ -108,6 +108,16 @@ class ObjectDetector:
                 cx = norm_x1 + (box_w / 2.0)
                 cy = norm_y1 + (box_h / 2.0)
 
+                # CANIE Geometrical Disambiguation:
+                # Vertical cylindrical bodies (aspect ratio h/w >= 1.6) misclassified as remote -> Bottle
+                aspect = (box_h * h) / max(1.0, (box_w * w))
+                if class_name in ("remote", "cell phone") and aspect >= 1.6 and (box_h * h) >= 65:
+                    class_name = "bottle"
+                    confidence = min(0.98, confidence + 0.15)
+                elif class_name == "cup" and aspect >= 1.8:
+                    class_name = "bottle"
+                    confidence = min(0.98, confidence + 0.10)
+
                 detections.append(Detection(
                     class_name=class_name,
                     confidence=round(confidence, 2),

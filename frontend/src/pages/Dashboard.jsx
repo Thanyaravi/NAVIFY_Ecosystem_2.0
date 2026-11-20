@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { toast } from "sonner";
 import {
   ArrowUpRight,
   ArrowDownRight,
@@ -22,10 +24,14 @@ import {
   Play,
   ShieldCheck,
   Circle,
+  Wine,
+  Sparkles,
+  ArrowRight,
 } from "lucide-react";
 import { GlassCard, fadeUp, stagger } from "@/components/GlassCard";
 import { StatusPill } from "@/components/StatusPill";
 import { useAuth } from "@/context/AuthContext";
+import { audioService } from "@/lib/audioService";
 import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { dashboardStats, statusPills, hardwareStatus, recentDetections, deviceHealth } from "@/lib/mockData";
@@ -49,6 +55,8 @@ const ICON_MAP = {
   Play,
   ShieldCheck,
   Circle,
+  Wine,
+  Sparkles,
 };
 
 const Icon = ({ name, ...props }) => {
@@ -90,7 +98,16 @@ const ACTIVITY_TONE = {
   blue: "bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400",
 };
 
-const DET_ICON = { Person: "User", "Cell Phone": "Smartphone", Chair: "Armchair", Door: "DoorOpen", Stairs: "Footprints", Obstacle: "TriangleAlert", Vehicle: "Car" };
+const DET_ICON = {
+  Bottle: "Wine",
+  Person: "User",
+  "Cell Phone": "Smartphone",
+  Chair: "Armchair",
+  Door: "DoorOpen",
+  Stairs: "Footprints",
+  Obstacle: "TriangleAlert",
+  Vehicle: "Car",
+};
 
 const timeAgo = (iso) => {
   if (!iso) return "Just now";
@@ -169,10 +186,27 @@ export default function Dashboard() {
         <p className="mt-2 max-w-3xl text-sm font-medium text-slate-600 dark:text-slate-400">
           Real-time AI-powered assistive navigation ecosystem.
         </p>
-        <div className="mt-6 flex flex-wrap gap-3">
+        <div className="mt-6 flex flex-wrap items-center gap-3">
           {pillsList.map((p) => (
             <StatusPill key={p.id} label={p.label} tone={p.tone} />
           ))}
+          <button
+            onClick={() => {
+              const phrase = audioService.testVoice();
+              toast.success("Voice Feedback Test", { description: phrase, icon: "🔊" });
+            }}
+            className="inline-flex items-center gap-1.5 rounded-full border border-indigo-200 bg-white/80 px-3.5 py-1.5 text-xs font-semibold text-indigo-700 shadow-sm transition hover:bg-white dark:border-indigo-500/30 dark:bg-indigo-500/10 dark:text-indigo-300"
+          >
+            <Volume2 className="h-3.5 w-3.5" />
+            Test Voice Feedback
+          </button>
+          <Link
+            to="/live-monitor"
+            className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-indigo-600 via-blue-600 to-cyan-500 px-4 py-1.5 text-xs font-bold text-white shadow-md shadow-indigo-500/25 transition hover:opacity-95"
+          >
+            <Play className="h-3 w-3" />
+            Launch Live AI Camera
+          </Link>
         </div>
       </motion.section>
 
@@ -222,7 +256,15 @@ export default function Dashboard() {
                 <Camera className="h-7 w-7 text-slate-400" />
               </motion.div>
               <p className="mt-4 text-sm font-medium text-slate-500 dark:text-slate-400">Waiting for Raspberry Pi Camera...</p>
-              <p className="mt-1 text-xs text-slate-400 dark:text-slate-500">Open Live Monitor to run detection on your phone camera</p>
+              <p className="mt-1 text-xs text-slate-400 dark:text-slate-500">Open Live Monitor to run real-time YOLOv11 & voice detection</p>
+              <Link
+                to="/live-monitor"
+                className="mt-4 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-indigo-600 via-blue-600 to-cyan-500 px-5 py-2 text-xs font-bold text-white shadow-lg shadow-indigo-500/25 transition-all hover:scale-105 active:scale-95"
+              >
+                <Play className="h-3.5 w-3.5" />
+                Launch Assistive Camera Console
+                <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
             </div>
           </GlassCard>
         </motion.div>

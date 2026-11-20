@@ -36,11 +36,11 @@ export const hardwareStatus = [
 ];
 
 export const recentDetections = [
-  { id: 1, label: "Person", icon: "User", time: "2 min ago", confidence: 98, created_at: new Date(Date.now() - 2 * 60000).toISOString() },
-  { id: 2, label: "Cell Phone", icon: "Smartphone", time: "5 min ago", confidence: 94, created_at: new Date(Date.now() - 5 * 60000).toISOString() },
-  { id: 3, label: "Chair", icon: "Armchair", time: "11 min ago", confidence: 91, created_at: new Date(Date.now() - 11 * 60000).toISOString() },
-  { id: 4, label: "Door", icon: "DoorOpen", time: "18 min ago", confidence: 89, created_at: new Date(Date.now() - 18 * 60000).toISOString() },
-  { id: 5, label: "Obstacle", icon: "TriangleAlert", time: "24 min ago", confidence: 87, created_at: new Date(Date.now() - 24 * 60000).toISOString() },
+  { id: 1, label: "Bottle", icon: "Wine", time: "Just now", confidence: 96, created_at: new Date(Date.now() - 1 * 60000).toISOString() },
+  { id: 2, label: "Person", icon: "User", time: "2 min ago", confidence: 98, created_at: new Date(Date.now() - 2 * 60000).toISOString() },
+  { id: 3, label: "Cell Phone", icon: "Smartphone", time: "5 min ago", confidence: 94, created_at: new Date(Date.now() - 5 * 60000).toISOString() },
+  { id: 4, label: "Chair", icon: "Armchair", time: "11 min ago", confidence: 91, created_at: new Date(Date.now() - 11 * 60000).toISOString() },
+  { id: 5, label: "Door", icon: "DoorOpen", time: "18 min ago", confidence: 89, created_at: new Date(Date.now() - 18 * 60000).toISOString() },
 ];
 
 export const deviceHealth = [
