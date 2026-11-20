@@ -104,22 +104,25 @@ export default function Settings() {
         <motion.div variants={fadeUp} className="lg:col-span-3">
           <GlassCard className="p-3">
             <nav className="flex gap-2 overflow-x-auto lg:flex-col">
-              {SECTIONS.map((s) => (
-                <button
-                  key={s.id}
-                  onClick={() => setSection(s.id)}
-                  data-testid={`settings-tab-${s.id}`}
-                  className={cn(
-                    "flex flex-shrink-0 items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium transition-colors",
-                    section === s.id
-                      ? "bg-white text-indigo-700 shadow-sm dark:bg-indigo-500/15 dark:text-indigo-300"
-                      : "text-slate-500 hover:bg-white/60 hover:text-slate-800 dark:text-slate-400 dark:hover:bg-white/5 dark:hover:text-white"
-                  )}
-                >
-                  <s.icon className="h-4 w-4" />
-                  {s.label}
-                </button>
-              ))}
+              {SECTIONS.map((s) => {
+                const SectionIcon = s.icon;
+                return (
+                  <button
+                    key={s.id}
+                    onClick={() => setSection(s.id)}
+                    data-testid={`settings-tab-${s.id}`}
+                    className={cn(
+                      "flex flex-shrink-0 items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium transition-colors",
+                      section === s.id
+                        ? "bg-white text-indigo-700 shadow-sm dark:bg-indigo-500/15 dark:text-indigo-300"
+                        : "text-slate-500 hover:bg-white/60 hover:text-slate-800 dark:text-slate-400 dark:hover:bg-white/5 dark:hover:text-white"
+                    )}
+                  >
+                    <SectionIcon className="h-4 w-4" />
+                    {s.label}
+                  </button>
+                );
+              })}
             </nav>
           </GlassCard>
         </motion.div>
@@ -129,10 +132,16 @@ export default function Settings() {
             {section === "profile" && (
               <div>
                 <div className="mb-6 flex items-center gap-4">
-                  <img src={user?.avatar} alt={user?.name} className="h-16 w-16 rounded-2xl object-cover ring-2 ring-white dark:ring-slate-700" />
+                  {user?.avatar ? (
+                    <img src={user.avatar} alt={user?.name} className="h-16 w-16 rounded-2xl object-cover ring-2 ring-white dark:ring-slate-700" />
+                  ) : (
+                    <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-600 to-blue-500 text-xl font-bold text-white shadow-md ring-2 ring-white dark:ring-slate-700">
+                      {(user?.name || "T").charAt(0).toUpperCase()}
+                    </div>
+                  )}
                   <div>
-                    <p className="text-lg font-semibold tracking-tight text-slate-900 dark:text-white">{user?.name}</p>
-                    <p className="text-sm capitalize text-slate-400 dark:text-slate-500">{user?.role} · {user?.email}</p>
+                    <p className="text-lg font-semibold tracking-tight text-slate-900 dark:text-white">{user?.name || "Thanya C Ravi"}</p>
+                    <p className="text-sm capitalize text-slate-400 dark:text-slate-500">{user?.role || "User"} · {user?.email || "thanyaravi02@gmail.com"}</p>
                   </div>
                 </div>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

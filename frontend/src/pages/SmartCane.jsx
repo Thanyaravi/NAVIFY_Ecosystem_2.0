@@ -72,17 +72,20 @@ export default function SmartCane() {
           <GlassCard className="h-full p-6">
             <h3 className="mb-5 text-lg font-semibold tracking-tight text-slate-900 dark:text-white">Device Information</h3>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              {info.map((i) => (
-                <div key={i.label} className="flex items-center gap-3 rounded-2xl border border-white/70 bg-white/50 p-4 dark:border-white/10 dark:bg-white/5">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400">
-                    <i.icon className="h-4 w-4" />
+              {info.map((i) => {
+                const InfoIcon = i.icon;
+                return (
+                  <div key={i.label} className="flex items-center gap-3 rounded-2xl border border-white/70 bg-white/50 p-4 dark:border-white/10 dark:bg-white/5">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400">
+                      <InfoIcon className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium text-slate-400 dark:text-slate-500">{i.label}</p>
+                      <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">{i.value}</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-xs font-medium text-slate-400 dark:text-slate-500">{i.label}</p>
-                    <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">{i.value}</p>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </GlassCard>
         </motion.div>

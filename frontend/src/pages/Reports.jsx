@@ -67,25 +67,28 @@ export default function Reports() {
       <PageHeader title="Reports" subtitle="Download and review your journey and detection history." />
 
       <motion.section variants={stagger} className="grid grid-cols-1 gap-6 sm:grid-cols-3">
-        {reports.map((r) => (
-          <motion.div key={r.id} variants={fadeUp}>
-            <GlassCard hover className="flex h-full flex-col p-6">
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400">
-                <r.icon className="h-5 w-5" />
-              </div>
-              <h3 className="mt-4 text-base font-semibold tracking-tight text-slate-900 dark:text-white">{r.title}</h3>
-              <p className="mt-1 flex-1 text-sm text-slate-500 dark:text-slate-400">{r.detail}</p>
-              <button
-                onClick={() => handleExport(r)}
-                data-testid={`export-${r.id}-button`}
-                className="mt-5 inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-indigo-600 to-blue-500 py-2.5 text-sm font-semibold text-white shadow-md shadow-indigo-500/25 transition-all duration-200 hover:shadow-lg active:scale-95"
-              >
-                <Download className="h-4 w-4" />
-                Export
-              </button>
-            </GlassCard>
-          </motion.div>
-        ))}
+        {reports.map((r) => {
+          const ReportIcon = r.icon;
+          return (
+            <motion.div key={r.id} variants={fadeUp}>
+              <GlassCard hover className="flex h-full flex-col p-6">
+                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400">
+                  <ReportIcon className="h-5 w-5" />
+                </div>
+                <h3 className="mt-4 text-base font-semibold tracking-tight text-slate-900 dark:text-white">{r.title}</h3>
+                <p className="mt-1 flex-1 text-sm text-slate-500 dark:text-slate-400">{r.detail}</p>
+                <button
+                  onClick={() => handleExport(r)}
+                  data-testid={`export-${r.id}-button`}
+                  className="mt-5 inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-indigo-600 to-blue-500 py-2.5 text-sm font-semibold text-white shadow-md shadow-indigo-500/25 transition-all duration-200 hover:shadow-lg active:scale-95"
+                >
+                  <Download className="h-4 w-4" />
+                  Export
+                </button>
+              </GlassCard>
+            </motion.div>
+          );
+        })}
       </motion.section>
 
       <motion.div variants={fadeUp}>

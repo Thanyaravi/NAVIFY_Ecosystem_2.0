@@ -117,27 +117,30 @@ export default function LiveMonitor() {
           {[
             { id: "cane", label: "Smart Cane", icon: Radio },
             { id: "mobile", label: "Mobile Camera", icon: Camera },
-          ].map((s) => (
-            <button
-              key={s.id}
-              onClick={() => setSource(s.id)}
-              data-testid={`source-${s.id}`}
-              className={cn(
-                "relative flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium transition-colors",
-                source === s.id ? "text-white" : "text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white"
-              )}
-            >
-              {source === s.id && (
-                <motion.div
-                  layoutId="source-active"
-                  className="absolute inset-0 rounded-full bg-gradient-to-r from-indigo-600 to-blue-500 shadow-md shadow-indigo-500/30"
-                  transition={{ type: "spring", stiffness: 400, damping: 32 }}
-                />
-              )}
-              <s.icon className="relative z-10 h-4 w-4" />
-              <span className="relative z-10">{s.label}</span>
-            </button>
-          ))}
+          ].map((s) => {
+            const SourceIcon = s.icon;
+            return (
+              <button
+                key={s.id}
+                onClick={() => setSource(s.id)}
+                data-testid={`source-${s.id}`}
+                className={cn(
+                  "relative flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium transition-colors",
+                  source === s.id ? "text-white" : "text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white"
+                )}
+              >
+                {source === s.id && (
+                  <motion.div
+                    layoutId="source-active"
+                    className="absolute inset-0 rounded-full bg-gradient-to-r from-indigo-600 to-blue-500 shadow-md shadow-indigo-500/30"
+                    transition={{ type: "spring", stiffness: 400, damping: 32 }}
+                  />
+                )}
+                <SourceIcon className="relative z-10 h-4 w-4" />
+                <span className="relative z-10">{s.label}</span>
+              </button>
+            );
+          })}
         </div>
       </motion.div>
 

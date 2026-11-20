@@ -46,6 +46,7 @@ class ErrorBoundary extends Component {
               onClick={() => {
                 this.setState({ hasError: false, error: null });
                 localStorage.removeItem("navify_local_user");
+                localStorage.removeItem("navify_token");
                 window.location.href = "/dashboard";
               }}
               className="mt-6 w-full rounded-2xl bg-gradient-to-r from-indigo-600 to-blue-500 py-3 text-sm font-semibold text-white shadow-lg"
