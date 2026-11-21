@@ -111,7 +111,7 @@ export const Sidebar = () => {
               {user?.name || "Thanya C Ravi"}
             </p>
             <p className="truncate text-xs capitalize text-slate-400 dark:text-slate-500">
-              {user?.role || "User"}
+              {user?.role || "Student"}
             </p>
           </div>
           <button

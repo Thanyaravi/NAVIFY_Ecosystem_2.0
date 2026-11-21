@@ -16,21 +16,17 @@ const reports = [
 const timeFmt = (iso) => new Date(iso).toLocaleString("en-US", { month: "short", day: "2-digit", hour: "2-digit", minute: "2-digit" });
 
 export default function Reports() {
-  const [journeys, setJourneys] = useState([]);
-  const [detections, setDetections] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [journeys, setJourneys] = useState(journeyHistory);
+  const [detections, setDetections] = useState(detectionHistory);
 
   useEffect(() => {
     (async () => {
       try {
         const [j, d] = await Promise.all([api.get("/journeys"), api.get("/detections", { params: { limit: 20 } })]);
-        setJourneys(Array.isArray(j?.data) ? j.data : journeyHistory);
-        setDetections(Array.isArray(d?.data) ? d.data : detectionHistory);
+        if (Array.isArray(j?.data)) setJourneys(j.data);
+        if (Array.isArray(d?.data)) setDetections(d.data);
       } catch {
-        setJourneys(journeyHistory);
-        setDetections(detectionHistory);
-      } finally {
-        setLoading(false);
+        /* static fallback already in state */
       }
     })();
   }, []);
@@ -57,10 +53,6 @@ export default function Reports() {
     else downloadCSV("navify-summary", [{ trips: journeys.length, detections: detections.length, generated: new Date().toISOString() }]);
     toast.success(`${r.title} exported`, { description: "Your file has been downloaded." });
   };
-
-  if (loading) {
-    return <div className="flex h-[60vh] items-center justify-center"><Loader2 className="h-7 w-7 animate-spin text-indigo-500" /></div>;
-  }
 
   return (
     <motion.div variants={stagger} initial="hidden" animate="show" className="space-y-8">

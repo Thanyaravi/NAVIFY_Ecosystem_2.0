@@ -39,19 +39,53 @@ const STATUS_TONE = {
 };
 
 const DEFAULT_LOC = {
-  label: "SVIT Campus, Bengaluru",
-  coords: "13.06475°, 77.59545°",
-  accuracy: "±92 m",
+  label: "Sai Vidya Institute of Technology, Rajanukunte",
+  address: "Doddaballapur Main Road, Rajanukunte, Bengaluru, Karnataka 560064",
+  coords: "13.16335°, 77.56278°",
+  accuracy: "±8 m",
   updated: "Just now",
-  lat: 13.06475,
-  lng: 77.59545,
-  maps: "https://maps.google.com/?q=13.06475,77.59545",
+  lat: 13.16335,
+  lng: 77.56278,
+  maps: "https://maps.google.com/?q=13.16335,77.56278",
+};
+
+const reverseGeocode = async (lat, lng) => {
+  try {
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`,
+      { headers: { "Accept-Language": "en" } }
+    );
+    if (!res.ok) throw new Error("Reverse geocode failed");
+    const data = await res.json();
+    const addr = data.address || {};
+    const landmark = addr.amenity || addr.building || addr.college || addr.university || addr.road || addr.isolated_dwelling;
+    const neighborhood = addr.neighbourhood || addr.suburb || addr.residential || addr.subdivision;
+    const city = addr.city || addr.town || addr.municipality || addr.city_district || "Bengaluru";
+    const state = addr.state || "Karnataka";
+    const postal = addr.postcode ? ` - ${addr.postcode}` : "";
+
+    const cleanParts = [landmark, neighborhood, city].filter(Boolean);
+    const shortLabel = cleanParts.length > 0 ? cleanParts.join(", ") : (data.display_name?.split(",").slice(0, 3).join(", ") || "Bengaluru");
+    const fullAddress = data.display_name || `${shortLabel}, ${state}${postal}`;
+
+    return { shortLabel, fullAddress };
+  } catch (err) {
+    console.warn("Reverse geocode fallback:", err);
+    return null;
+  }
 };
 
 export default function SOS() {
-  const [contacts, setContacts] = useState([]);
-  const [history, setHistory] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [contacts, setContacts] = useState(mockEmergencyContacts);
+  const [history, setHistory] = useState(() => {
+    try {
+      const stored = localStorage.getItem("navify_sos_history");
+      return stored ? JSON.parse(stored) : mockSosHistory;
+    } catch {
+      return mockSosHistory;
+    }
+  });
+  const [loading, setLoading] = useState(false);
   const [active, setActive] = useState(false);
   const [loc, setLoc] = useState(DEFAULT_LOC);
   const [sms, setSms] = useState(true);
@@ -63,41 +97,71 @@ export default function SOS() {
   const load = async () => {
     try {
       const [c, h] = await Promise.all([api.get("/contacts"), api.get("/sos")]);
-      setContacts(Array.isArray(c?.data) ? c.data : mockEmergencyContacts);
-      
+      if (Array.isArray(c?.data)) setContacts(c.data);
       const storedHistory = JSON.parse(localStorage.getItem("navify_sos_history") || "null");
-      setHistory(storedHistory || (Array.isArray(h?.data) ? h.data : mockSosHistory));
+      if (storedHistory) setHistory(storedHistory);
+      else if (Array.isArray(h?.data)) setHistory(h.data);
     } catch {
-      setContacts(mockEmergencyContacts);
-      const storedHistory = JSON.parse(localStorage.getItem("navify_sos_history") || "null");
-      setHistory(storedHistory || mockSosHistory);
+      /* local defaults already initialized */
     }
   };
 
   const getLocation = useCallback(() => {
     if (!("geolocation" in navigator)) {
-      setLoc((l) => ({ ...l, label: "Location unsupported", coords: "13.06475°, 77.59545°" }));
+      setLoc(DEFAULT_LOC);
       return;
     }
-    setLoc((l) => ({ ...l, label: "Updating GPS…", coords: "Acquiring satellites" }));
+    setLoc((l) => ({ ...l, label: "Acquiring live satellite fix…", coords: "Locking GPS coordinates…" }));
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
+      async (pos) => {
         const { latitude, longitude, accuracy } = pos.coords;
-        setLoc({
-          label: "Current position (Live)",
-          coords: `${latitude.toFixed(5)}°, ${longitude.toFixed(5)}°`,
+        const latStr = `${latitude.toFixed(5)}°`;
+        const lngStr = `${longitude.toFixed(5)}°`;
+        const mapsLink = `https://maps.google.com/?q=${latitude},${longitude}`;
+
+        setLoc((prev) => ({
+          ...prev,
+          label: "Resolving real street address…",
+          coords: `${latStr}, ${lngStr}`,
           accuracy: `±${Math.round(accuracy)} m`,
           updated: "Just now",
           lat: latitude,
           lng: longitude,
-          maps: `https://maps.google.com/?q=${latitude},${longitude}`,
-        });
+          maps: mapsLink,
+        }));
+
+        const geo = await reverseGeocode(latitude, longitude);
+        if (geo) {
+          setLoc({
+            label: geo.shortLabel,
+            address: geo.fullAddress,
+            coords: `${latStr}, ${lngStr}`,
+            accuracy: `±${Math.round(accuracy)} m`,
+            updated: "Just now",
+            lat: latitude,
+            lng: longitude,
+            maps: mapsLink,
+          });
+          toast.success("Real GPS Location Locked", {
+            description: `${geo.shortLabel} (${latStr}, ${lngStr})`,
+          });
+        } else {
+          setLoc({
+            label: "Sai Vidya Institute of Technology, Rajanukunte",
+            address: "Doddaballapur Main Road, Rajanukunte, Bengaluru, Karnataka 560064",
+            coords: `${latStr}, ${lngStr}`,
+            accuracy: `±${Math.round(accuracy)} m`,
+            updated: "Just now",
+            lat: latitude,
+            lng: longitude,
+            maps: mapsLink,
+          });
+        }
       },
       () => {
-        // Fallback to SVIT Institutional Coordinates
         setLoc(DEFAULT_LOC);
       },
-      { enableHighAccuracy: true, timeout: 8000 }
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
     );
   }, []);
 
@@ -149,12 +213,13 @@ export default function SOS() {
       id: Date.now(),
       type,
       time: nowStr,
-      user: "Thanya C Ravi (Lead Researcher)",
+      user: "Thanya C Ravi (Student)",
       department: "CSE (AI & ML), Sai Vidya Institute of Technology",
       device: "NAVIFY Cane Pro (NC-2400 · NVF-2400-8821)",
-      location: loc.label || "SVIT Campus, Bengaluru",
-      coords: `${lat}°, ${lng}°`,
-      accuracy: loc.accuracy || "±92 m",
+      location: loc.label || "Sai Vidya Institute of Technology, Rajanukunte",
+      address: loc.address || "Doddaballapur Main Road, Rajanukunte, Bengaluru, Karnataka 560064",
+      coords: `${lat.toFixed(5)}°, ${lng.toFixed(5)}°`,
+      accuracy: loc.accuracy || "±8 m",
       mapsLink,
       battery: "86%",
       contacts: contacts.length ? contacts : mockEmergencyContacts,
@@ -176,7 +241,7 @@ export default function SOS() {
       type,
       status: "Active (Dispatched)",
       time: nowStr,
-      location: `${loc.label || "SVIT Campus"} (${lat}°, ${lng}°)`,
+      location: `${loc.label || "Sai Vidya Institute of Technology, Rajanukunte"} (${lat.toFixed(5)}°, ${lng.toFixed(5)}°)`,
     };
 
     const updatedHistory = [newEntry, ...history];
@@ -243,27 +308,22 @@ export default function SOS() {
       time: "Just now",
       coords: loc.coords,
       mapsLink: loc.maps,
+      address: loc.address || loc.label,
     };
     return encodeURIComponent(
       `🚨 *EMERGENCY SOS ALERT — NAVIFY 2.0 SMART CANE*\n` +
-      `User: Thanya C Ravi\n` +
+      `User: Thanya C Ravi (Student)\n` +
       `Institution: Sai Vidya Institute of Technology (CSE AI&ML)\n` +
       `Alert Type: ${data.type}\n` +
       `Time: ${data.time}\n` +
+      `Real Location: ${loc.label}\n` +
+      `Full Address: ${loc.address || loc.label}\n` +
       `Live Cane Coordinates: ${data.coords}\n` +
-      `Google Maps Location: ${data.mapsLink}\n` +
+      `Google Maps Link: ${data.mapsLink}\n` +
       `Device Telemetry: Battery 86% · IMU BNO085 · Sensors Active\n` +
       `Immediate assistance requested!`
     );
   };
-
-  if (loading) {
-    return (
-      <div className="flex h-[60vh] items-center justify-center">
-        <Loader2 className="h-7 w-7 animate-spin text-indigo-500" />
-      </div>
-    );
-  }
 
   return (
     <motion.div variants={stagger} initial="hidden" animate="show" className="space-y-8">
@@ -416,7 +476,7 @@ export default function SOS() {
                   <p className="text-2xl font-black tracking-tight text-white">{loc.label}</p>
                   <p className="mt-1 font-mono text-sm text-cyan-300">{loc.coords}</p>
                   <p className="mt-1 text-xs text-slate-300">
-                    Institution: Sai Vidya Institute of Technology, Rajanukunte, Bengaluru
+                    {loc.address || "Sai Vidya Institute of Technology, Rajanukunte, Bengaluru, Karnataka 560064"}
                   </p>
                 </div>
               </div>
@@ -466,78 +526,46 @@ export default function SOS() {
             </div>
 
             <div className="space-y-3.5">
-              {contacts.map((c) => {
-                const waLink = `https://wa.me/91${c.phone}?text=${getDistressMessage()}`;
-                const smsLink = `sms:${c.phone}?body=${getDistressMessage()}`;
-                const mailLink = `mailto:${c.email}?subject=${encodeURIComponent(
-                  "🚨 EMERGENCY SOS ALERT: Thanya C Ravi"
-                )}&body=${getDistressMessage()}`;
-
-                return (
-                  <div
-                    key={c.id}
-                    className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl border border-white/70 bg-white/60 p-4 dark:border-white/10 dark:bg-white/5 transition-all hover:shadow-md"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-600 to-blue-500 text-base font-bold text-white shadow-md shadow-indigo-500/20">
-                        {c.name.charAt(0)}
-                      </div>
-                      <div>
-                        <p className="flex items-center gap-1.5 text-sm font-bold text-slate-900 dark:text-white">
-                          {c.name}
-                          {c.primary && (
-                            <span className="flex items-center gap-1 rounded bg-amber-500/15 px-1.5 py-0.5 text-[10px] font-bold text-amber-700 dark:text-amber-400">
-                              <Star className="h-3 w-3 fill-amber-400 text-amber-400" /> Primary
-                            </span>
-                          )}
-                        </p>
-                        <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
-                          {c.relation} · <span className="font-mono">{c.phone}</span>
-                        </p>
-                        {c.email && (
-                          <p className="text-[11px] text-slate-400 dark:text-slate-500 truncate max-w-[220px]">
-                            {c.email}
-                          </p>
-                        )}
-                      </div>
+              {contacts.map((c) => (
+                <div
+                  key={c.id}
+                  className="flex items-center justify-between gap-3 rounded-2xl border border-white/70 bg-white/60 p-4 dark:border-white/10 dark:bg-white/5 transition-all hover:shadow-md"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-600 to-blue-500 text-base font-bold text-white shadow-md shadow-indigo-500/20">
+                      {c.name.charAt(0)}
                     </div>
-
-                    {/* Direct One-Tap Notification Actions */}
-                    <div className="flex items-center gap-1.5 self-end sm:self-center">
-                      <a
-                        href={waLink}
-                        target="_blank"
-                        rel="noreferrer"
-                        title="Send Instant WhatsApp Alert"
-                        className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 transition hover:bg-emerald-100 hover:scale-105 dark:bg-emerald-500/15 dark:text-emerald-400"
-                      >
-                        <MessageSquare className="h-3.5 w-3.5" />
-                      </a>
-                      <a
-                        href={smsLink}
-                        title="Send SMS"
-                        className="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-50 text-blue-600 transition hover:bg-blue-100 hover:scale-105 dark:bg-blue-500/15 dark:text-blue-400"
-                      >
-                        <Send className="h-3.5 w-3.5" />
-                      </a>
-                      <a
-                        href={mailLink}
-                        title="Send Email"
-                        className="flex h-8 w-8 items-center justify-center rounded-xl bg-violet-50 text-violet-600 transition hover:bg-violet-100 hover:scale-105 dark:bg-violet-500/15 dark:text-violet-400"
-                      >
-                        <Mail className="h-3.5 w-3.5" />
-                      </a>
-                      <a
-                        href={`tel:${c.phone}`}
-                        title="Call Phone"
-                        className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-500 text-white shadow-sm transition hover:bg-emerald-600 hover:scale-105"
-                      >
-                        <Phone className="h-3.5 w-3.5" />
-                      </a>
+                    <div>
+                      <p className="flex items-center gap-1.5 text-sm font-bold text-slate-900 dark:text-white">
+                        {c.name}
+                        {c.primary && (
+                          <span className="flex items-center gap-1 rounded bg-amber-500/15 px-1.5 py-0.5 text-[10px] font-bold text-amber-700 dark:text-amber-400">
+                            <Star className="h-3 w-3 fill-amber-400 text-amber-400" /> Primary
+                          </span>
+                        )}
+                      </p>
+                      <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                        {c.relation} · <span className="font-mono">{c.phone}</span>
+                      </p>
+                      {c.email && (
+                        <p className="text-[11px] text-slate-400 dark:text-slate-500 truncate max-w-[220px]">
+                          {c.email}
+                        </p>
+                      )}
                     </div>
                   </div>
-                );
-              })}
+
+                  {/* Direct One-Tap Emergency Phone Call */}
+                  <a
+                    href={`tel:${c.phone}`}
+                    title={`Call ${c.name} (${c.phone})`}
+                    data-testid={`call-contact-${c.id}`}
+                    className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-500 transition-all hover:bg-emerald-500 hover:text-white dark:bg-emerald-500/15 dark:text-emerald-400 dark:hover:bg-emerald-500 dark:hover:text-white shadow-sm hover:scale-105"
+                  >
+                    <Phone className="h-4 w-4" />
+                  </a>
+                </div>
+              ))}
             </div>
           </GlassCard>
         </motion.div>

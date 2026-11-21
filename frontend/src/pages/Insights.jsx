@@ -18,21 +18,17 @@ const weekly = [
 ];
 
 export default function Insights() {
-  const [mostDetected, setMostDetected] = useState([]);
-  const [journeys, setJourneys] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [mostDetected, setMostDetected] = useState(mockInsights.mostDetected);
+  const [journeys, setJourneys] = useState(journeyHistory);
 
   useEffect(() => {
     (async () => {
       try {
         const [stats, j] = await Promise.all([api.get("/detections/stats"), api.get("/journeys")]);
-        setMostDetected(Array.isArray(stats?.data) ? stats.data : mockInsights.mostDetected);
-        setJourneys(Array.isArray(j?.data) ? j.data : journeyHistory);
+        if (Array.isArray(stats?.data)) setMostDetected(stats.data);
+        if (Array.isArray(j?.data)) setJourneys(j.data);
       } catch {
-        setMostDetected(mockInsights.mostDetected);
-        setJourneys(journeyHistory);
-      } finally {
-        setLoading(false);
+        /* static fallback already in state */
       }
     })();
   }, []);
@@ -46,10 +42,6 @@ export default function Insights() {
   ];
   const maxDaily = Math.max(...daily.map((d) => d.value));
   const maxDet = Math.max(...mostDetected.map((o) => o.count), 1);
-
-  if (loading) {
-    return <div className="flex h-[60vh] items-center justify-center"><Loader2 className="h-7 w-7 animate-spin text-indigo-500" /></div>;
-  }
 
   return (
     <motion.div variants={stagger} initial="hidden" animate="show" className="space-y-8">

@@ -141,14 +141,16 @@ export default function Settings() {
                   )}
                   <div>
                     <p className="text-lg font-semibold tracking-tight text-slate-900 dark:text-white">{user?.name || "Thanya C Ravi"}</p>
-                    <p className="text-sm capitalize text-slate-400 dark:text-slate-500">{user?.role || "User"} · {user?.email || "thanyaravi02@gmail.com"}</p>
+                    <p className="text-sm capitalize text-slate-400 dark:text-slate-500">Student · {user?.email || "thanyaravi02@gmail.com"}</p>
                   </div>
                 </div>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   {[
-                    { l: "Full Name", v: user?.name },
-                    { l: "Email", v: user?.email },
-                    { l: "Role", v: user?.role },
+                    { l: "Full Name", v: user?.name || "Thanya C Ravi" },
+                    { l: "Email", v: user?.email || "thanyaravi02@gmail.com" },
+                    { l: "Role", v: "Student" },
+                    { l: "Institution", v: user?.institution || "Sai Vidya Institute of Technology" },
+                    { l: "Department", v: user?.department || "CSE (AI & ML)" },
                     { l: "Timezone", v: "Asia/Kolkata (GMT+5:30)" },
                   ].map((f) => (
                     <div key={f.l}>
