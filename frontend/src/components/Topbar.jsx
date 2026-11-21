@@ -40,9 +40,7 @@ const ThemeToggle = () => {
 
 export const Topbar = () => {
   const { pathname } = useLocation();
-  const { user } = useAuth();
   const meta = TITLES[pathname] || { title: "Dashboard", welcome: "Welcome back" };
-  const firstName = (user?.name || "there").split(" ")[0];
 
   return (
     <header
@@ -54,7 +52,7 @@ export const Topbar = () => {
           {meta.title}
         </h2>
         <p className="text-sm text-slate-400 dark:text-slate-500">
-          {meta.welcome}, {firstName}.
+          {meta.welcome}, Thanya.
         </p>
       </div>
 
@@ -73,17 +71,9 @@ export const Topbar = () => {
           data-testid="profile-button"
           aria-label="Profile"
         >
-          {user?.avatar ? (
-            <img
-              src={user.avatar}
-              alt={user?.name || "User"}
-              className="h-9 w-9 rounded-full object-cover ring-2 ring-white dark:ring-slate-700"
-            />
-          ) : (
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-indigo-600 to-blue-500 text-sm font-bold text-white shadow-md">
-              {(user?.name || "T").charAt(0).toUpperCase()}
-            </div>
-          )}
+          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-indigo-600 to-blue-500 text-sm font-bold text-white shadow-md ring-2 ring-white/50 dark:ring-slate-700">
+            T
+          </div>
         </button>
       </div>
     </header>

@@ -15,20 +15,39 @@ export const AuthProvider = ({ children }) => {
       const queryToken = new URLSearchParams(window.location.search).get("token");
       if (hashToken || queryToken) setToken(hashToken || queryToken);
       
+      const defaultStudentUser = {
+        name: "Thanya C Ravi",
+        email: "thanyaravi02@gmail.com",
+        role: "Student",
+        institution: "Sai Vidya Institute of Technology",
+        department: "CSE (AI & ML)",
+        avatar: "",
+      };
+
+      // Always sanitize cached user to strictly be Student with NO image
+      const cached = localStorage.getItem(LOCAL_USER_KEY);
+      if (cached) {
+        try {
+          const u = JSON.parse(cached);
+          u.name = "Thanya C Ravi";
+          u.role = "Student";
+          u.avatar = "";
+          u.institution = "Sai Vidya Institute of Technology";
+          u.department = "CSE (AI & ML)";
+          localStorage.setItem(LOCAL_USER_KEY, JSON.stringify(u));
+          setUser(u);
+        } catch {
+          localStorage.setItem(LOCAL_USER_KEY, JSON.stringify(defaultStudentUser));
+          setUser(defaultStudentUser);
+        }
+      } else {
+        localStorage.setItem(LOCAL_USER_KEY, JSON.stringify(defaultStudentUser));
+        setUser(defaultStudentUser);
+      }
+
       const token = getToken();
       if (!token) {
-        // Auto-provision default console session for standalone deployment
-        const defaultUser = {
-          name: "Thanya C Ravi",
-          email: "thanyaravi02@gmail.com",
-          role: "Student",
-          institution: "Sai Vidya Institute of Technology",
-          department: "CSE (AI & ML)",
-          avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80",
-        };
         setToken("navify_active_session");
-        setUser(defaultUser);
-        localStorage.setItem(LOCAL_USER_KEY, JSON.stringify(defaultUser));
         setLoading(false);
         return;
       }
@@ -36,42 +55,16 @@ export const AuthProvider = ({ children }) => {
         const { data } = await api.get("/auth/me");
         const u = {
           ...data.user,
-          name: data.user?.name && data.user?.name !== "Thanyaravi02" ? data.user.name : "Thanya C Ravi",
+          name: "Thanya C Ravi",
           role: "Student",
+          avatar: "",
+          institution: "Sai Vidya Institute of Technology",
+          department: "CSE (AI & ML)",
         };
         setUser(u);
         localStorage.setItem(LOCAL_USER_KEY, JSON.stringify(u));
       } catch {
-        // Fallback for standalone/Vercel deployment
-        const cached = localStorage.getItem(LOCAL_USER_KEY);
-        if (cached) {
-          try {
-            const u = JSON.parse(cached);
-            // Auto-upgrade role to Student and name to Thanya C Ravi
-            if (u.role !== "Student") u.role = "Student";
-            if (!u.name || u.name === "Thanyaravi02" || u.name === "Thanya C R" || u.name === "User") {
-              u.name = "Thanya C Ravi";
-            }
-            if (!u.avatar) {
-              u.avatar = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80";
-            }
-            setUser(u);
-            localStorage.setItem(LOCAL_USER_KEY, JSON.stringify(u));
-          } catch {
-            setToken(null);
-          }
-        } else {
-          const defaultUser = {
-            name: "Thanya C Ravi",
-            email: "thanyaravi02@gmail.com",
-            role: "Student",
-            institution: "Sai Vidya Institute of Technology",
-            department: "CSE (AI & ML)",
-            avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80",
-          };
-          setUser(defaultUser);
-          localStorage.setItem(LOCAL_USER_KEY, JSON.stringify(defaultUser));
-        }
+        /* local sanitized state is already set */
       } finally {
         setLoading(false);
       }
@@ -84,25 +77,24 @@ export const AuthProvider = ({ children }) => {
       const { data } = await api.post("/auth/login", { email, password });
       const u = {
         ...data.user,
-        name: data.user?.name && data.user?.name !== "Thanyaravi02" ? data.user.name : "Thanya C Ravi",
+        name: "Thanya C Ravi",
         role: "Student",
+        avatar: "",
+        institution: "Sai Vidya Institute of Technology",
+        department: "CSE (AI & ML)",
       };
       setToken(data.token);
       setUser(u);
       localStorage.setItem(LOCAL_USER_KEY, JSON.stringify(u));
       return u;
     } catch {
-      // Graceful offline/static fallback so user can always log in and test
-      const cleanName = email && !email.toLowerCase().includes("thanya")
-        ? email.split("@")[0].replace(/[._]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
-        : "Thanya C Ravi";
       const fallbackUser = {
-        name: cleanName || "Thanya C Ravi",
+        name: "Thanya C Ravi",
         email: email || "thanyaravi02@gmail.com",
         role: "Student",
         institution: "Sai Vidya Institute of Technology",
         department: "CSE (AI & ML)",
-        avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80",
+        avatar: "",
       };
       setToken("navify_auth_token_active");
       setUser(fallbackUser);
@@ -116,22 +108,24 @@ export const AuthProvider = ({ children }) => {
       const { data } = await api.post("/auth/register", { email, password, name });
       const u = {
         ...data.user,
-        name: name || (data.user?.name && data.user?.name !== "Thanyaravi02" ? data.user.name : "Thanya C Ravi"),
+        name: "Thanya C Ravi",
         role: "Student",
+        avatar: "",
+        institution: "Sai Vidya Institute of Technology",
+        department: "CSE (AI & ML)",
       };
       setToken(data.token);
       setUser(u);
       localStorage.setItem(LOCAL_USER_KEY, JSON.stringify(u));
       return u;
     } catch {
-      // Graceful offline/static fallback so user registration always succeeds
       const fallbackUser = {
-        name: name || "Thanya C Ravi",
+        name: "Thanya C Ravi",
         email: email || "thanyaravi02@gmail.com",
         role: "Student",
         institution: "Sai Vidya Institute of Technology",
         department: "CSE (AI & ML)",
-        avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80",
+        avatar: "",
       };
       setToken("navify_auth_token_active");
       setUser(fallbackUser);

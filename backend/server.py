@@ -172,19 +172,12 @@ def create_access_token(user_id: str, email: str) -> str:
 
 
 def public_user(doc: dict) -> dict:
-    raw_role = doc.get("role", "Student")
-    clean_role = "Student" if raw_role in ["user", "Lead Researcher", None] else raw_role
-    raw_name = doc.get("name", "Thanya C Ravi")
-    clean_name = "Thanya C Ravi" if raw_name in ["Thanyaravi02", "Thanya C R", ""] else raw_name
     return {
         "id": str(doc["_id"]),
         "email": doc["email"],
-        "name": clean_name,
-        "role": clean_role,
-        "avatar": doc.get(
-            "avatar",
-            "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80",
-        ),
+        "name": "Thanya C Ravi",
+        "role": "Student",
+        "avatar": "",
     }
 
 

@@ -132,30 +132,26 @@ export default function Settings() {
             {section === "profile" && (
               <div>
                 <div className="mb-6 flex items-center gap-4">
-                  {user?.avatar ? (
-                    <img src={user.avatar} alt={user?.name} className="h-16 w-16 rounded-2xl object-cover ring-2 ring-white dark:ring-slate-700" />
-                  ) : (
-                    <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-600 to-blue-500 text-xl font-bold text-white shadow-md ring-2 ring-white dark:ring-slate-700">
-                      {(user?.name || "T").charAt(0).toUpperCase()}
-                    </div>
-                  )}
+                  <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-600 to-blue-500 text-2xl font-bold text-white shadow-lg shadow-indigo-500/25 ring-2 ring-white/50 dark:ring-slate-700">
+                    T
+                  </div>
                   <div>
-                    <p className="text-lg font-semibold tracking-tight text-slate-900 dark:text-white">{user?.name || "Thanya C Ravi"}</p>
-                    <p className="text-sm capitalize text-slate-400 dark:text-slate-500">Student · {user?.email || "thanyaravi02@gmail.com"}</p>
+                    <p className="text-lg font-semibold tracking-tight text-slate-900 dark:text-white">Thanya C Ravi</p>
+                    <p className="text-sm text-slate-400 dark:text-slate-500">Student · thanyaravi02@gmail.com</p>
                   </div>
                 </div>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   {[
-                    { l: "Full Name", v: user?.name || "Thanya C Ravi" },
-                    { l: "Email", v: user?.email || "thanyaravi02@gmail.com" },
+                    { l: "Full Name", v: "Thanya C Ravi" },
+                    { l: "Email", v: "thanyaravi02@gmail.com" },
                     { l: "Role", v: "Student" },
-                    { l: "Institution", v: user?.institution || "Sai Vidya Institute of Technology" },
-                    { l: "Department", v: user?.department || "CSE (AI & ML)" },
+                    { l: "Institution", v: "Sai Vidya Institute of Technology" },
+                    { l: "Department", v: "CSE (AI & ML)" },
                     { l: "Timezone", v: "Asia/Kolkata (GMT+5:30)" },
                   ].map((f) => (
                     <div key={f.l}>
                       <label className="text-xs font-medium text-slate-400 dark:text-slate-500">{f.l}</label>
-                      <div className="mt-1.5 rounded-2xl border border-white/70 bg-white/60 px-4 py-3 text-sm font-medium capitalize text-slate-800 shadow-inner dark:border-white/10 dark:bg-white/5 dark:text-slate-100">
+                      <div className="mt-1.5 rounded-2xl border border-white/70 bg-white/60 px-4 py-3 text-sm font-medium text-slate-800 shadow-inner dark:border-white/10 dark:bg-white/5 dark:text-slate-100">
                         {f.v}
                       </div>
                     </div>

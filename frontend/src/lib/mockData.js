@@ -8,7 +8,7 @@ export const user = {
   role: "Student",
   institution: "Sai Vidya Institute of Technology",
   department: "CSE (AI & ML)",
-  avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80",
+  avatar: "",
 };
 
 export const dashboardStats = [

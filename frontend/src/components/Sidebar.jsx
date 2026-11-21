@@ -95,23 +95,15 @@ export const Sidebar = () => {
         </nav>
 
         <div className="mt-4 flex items-center gap-3 rounded-2xl border border-white/70 bg-white/50 p-3 dark:border-white/10 dark:bg-white/5">
-          {user?.avatar ? (
-            <img
-              src={user.avatar}
-              alt={user?.name || "User"}
-              className="h-9 w-9 rounded-full object-cover ring-2 ring-white dark:ring-slate-700"
-            />
-          ) : (
-            <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-600 to-blue-500 text-sm font-bold text-white shadow-md ring-2 ring-white dark:ring-slate-700">
-              {(user?.name || "T").charAt(0).toUpperCase()}
-            </div>
-          )}
+          <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-600 to-blue-500 text-sm font-bold text-white shadow-md ring-2 ring-white/50 dark:ring-slate-700">
+            T
+          </div>
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-semibold text-slate-800 dark:text-slate-100">
-              {user?.name || "Thanya C Ravi"}
+              Thanya C Ravi
             </p>
-            <p className="truncate text-xs capitalize text-slate-400 dark:text-slate-500">
-              {user?.role || "Student"}
+            <p className="truncate text-xs font-medium text-slate-400 dark:text-slate-500">
+              Student
             </p>
           </div>
           <button
