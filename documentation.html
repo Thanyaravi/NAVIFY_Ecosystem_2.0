@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>NAVIFY Ecosystem 2.0 — System Master Documentation</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+  @page {
+    size: A4;
+    margin: 14mm 14mm 16mm 14mm;
+    @bottom-right {
+      content: "Page " counter(page) " of " counter(pages);
+      font-family: 'Inter', sans-serif;
+      font-size: 8pt;
+      color: #94a3b8;
+    }
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: #1e293b;
+    background-color: #ffffff;
+    font-size: 9.5pt;
+    line-height: 1.5;
+    padding: 0;
+  }
+
+  .header-card {
+    background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+    color: #ffffff;
+    border-radius: 12px;
+    padding: 22px 26px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+    border: 1px solid #334155;
+  }
+
+  .header-card .badge {
+    display: inline-block;
+    background: rgba(99, 102, 241, 0.25);
+    border: 1px solid rgba(165, 180, 252, 0.4);
+    color: #c7d2fe;
+    font-size: 7.5pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    padding: 3px 10px;
+    border-radius: 9999px;
+    margin-bottom: 8px;
+  }
+
+  .header-card h1 {
+    font-size: 19pt;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: #ffffff;
+    margin-bottom: 4px;
+  }
+
+  .header-card .subtitle {
+    font-size: 9.5pt;
+    color: #cbd5e1;
+    font-weight: 500;
+    margin-bottom: 14px;
+  }
+
+  .meta-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    font-size: 8.5pt;
+  }
+
+  .meta-item strong {
+    color: #93c5fd;
+    font-weight: 600;
+  }
+
+  .meta-item a {
+    color: #38bdf8;
+    text-decoration: none;
+  }
+
+  h2 {
+    font-size: 12.5pt;
+    font-weight: 700;
+    color: #0f172a;
+    border-bottom: 1.5px solid #e2e8f0;
+    padding-bottom: 4px;
+    margin-top: 18px;
+    margin-bottom: 10px;
+    letter-spacing: -0.2px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    page-break-after: avoid;
+  }
+
+  h2::before {
+    content: "";
+    display: inline-block;
+    width: 4px;
+    height: 14px;
+    background: #4f46e5;
+    border-radius: 2px;
+  }
+
+  h3 {
+    font-size: 10.5pt;
+    font-weight: 600;
+    color: #334155;
+    margin-top: 12px;
+    margin-bottom: 6px;
+    page-break-after: avoid;
+  }
+
+  p {
+    margin-bottom: 8px;
+    color: #334155;
+  }
+
+  ul, ol {
+    margin-left: 18px;
+    margin-bottom: 10px;
+    color: #334155;
+  }
+
+  li {
+    margin-bottom: 3px;
+  }
+
+  .card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 10px;
+    page-break-inside: avoid;
+  }
+
+  .callout {
+    background: #eef2ff;
+    border-left: 3.5px solid #4f46e5;
+    padding: 10px 14px;
+    border-radius: 0 8px 8px 0;
+    margin: 10px 0;
+    page-break-inside: avoid;
+  }
+
+  .callout-title {
+    font-weight: 700;
+    color: #312e81;
+    font-size: 9pt;
+    margin-bottom: 3px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0 14px 0;
+    font-size: 8.5pt;
+    page-break-inside: avoid;
+  }
+
+  th, td {
+    padding: 7px 10px;
+    text-align: left;
+    border: 1px solid #cbd5e1;
+  }
+
+  th {
+    background-color: #f1f5f9;
+    color: #0f172a;
+    font-weight: 700;
+  }
+
+  tr:nth-child(even) td {
+    background-color: #f8fafc;
+  }
+
+  .pill {
+    display: inline-block;
+    padding: 2px 7px;
+    border-radius: 9999px;
+    font-size: 7.5pt;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  .pill-green { background: #dcfce7; color: #166534; }
+  .pill-blue { background: #dbeafe; color: #1e40af; }
+  .pill-indigo { background: #e0e7ff; color: #3730a3; }
+  .pill-amber { background: #fef3c7; color: #92400e; }
+
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8.5pt;
+    background: #f1f5f9;
+    padding: 1px 4px;
+    border-radius: 4px;
+    color: #0f172a;
+  }
+
+  pre {
+    background: #0f172a;
+    color: #e2e8f0;
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8pt;
+    line-height: 1.4;
+    margin: 8px 0 12px 0;
+    overflow-x: hidden;
+    page-break-inside: avoid;
+  }
+
+  .page-break {
+    page-break-before: always;
+  }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+
+  .footer-stamp {
+    margin-top: 25px;
+    padding-top: 10px;
+    border-top: 1px solid #cbd5e1;
+    font-size: 8pt;
+    color: #64748b;
+    display: flex;
+    justify-content: space-between;
+  }
+</style>
+</head>
+<body>
+
+  <!-- Header Banner -->
+  <div class="header-card">
+    <div class="badge">Major Project Phase-II · BCI586 / BCI786</div>
+    <h1>NAVIFY Ecosystem 2.0</h1>
+    <div class="subtitle">Real-Time Edge AI Assistive Navigation, Geometrical Disambiguation, & Caregiver Emergency Broadcast Hub</div>
+    
+    <div class="meta-grid">
+      <div class="meta-item">
+        <strong>Institution:</strong> Sai Vidya Institute of Technology (SVIT), Rajanukunte, Bengaluru<br>
+        <strong>Department:</strong> CSE (Artificial Intelligence & Machine Learning)<br>
+        <strong>Lead Author / Student:</strong> Thanya C Ravi (<a href="mailto:thanyaravi02@gmail.com">thanyaravi02@gmail.com</a>) · <strong>Role:</strong> Student
+      </div>
+      <div class="meta-item">
+        <strong>Project Guide / Mentor:</strong> Vikram Sir (+91 7875738893 · <a href="mailto:vikramadhithan.ac@saividya.ac.in">vikramadhithan.ac@saividya.ac.in</a>)<br>
+        <strong>Peer / Colleague:</strong> Tejas P (+91 9535829902 · <a href="mailto:tejas.p.23aiml@saividya.ac.in">tejas.p.23aiml@saividya.ac.in</a>)<br>
+        <strong>Production Deployment:</strong> <a href="https://navify-ecosystem-2-0-1.vercel.app">https://navify-ecosystem-2-0-1.vercel.app</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Executive Summary -->
+  <h2>1. Executive Summary</h2>
+  <p>
+    <strong>NAVIFY 2.0</strong> is an advanced assistive navigation and emergency telemetry ecosystem designed for visually impaired individuals. The system integrates low-power edge artificial intelligence with physical sensory hardware, enabling autonomous spatial orientation, obstacle proximity recognition, and instantaneous multi-channel emergency distress broadcasting.
+  </p>
+  <p>
+    The software architecture spans edge computer vision running <strong>YOLOv11</strong> with a proprietary <strong>CANIE Geometric Disambiguation</strong> filter, continuous spoken voice feedback synthesized via the <strong>Web Speech & Web Audio APIs</strong>, a 360° ultrasonic radar scope, and an emergency response center capable of reverse-geocoding real GPS coordinates into street addresses and transmitting one-tap alerts via WhatsApp, SMS, and Email to assigned caregivers.
+  </p>
+
+  <!-- Complete Architecture -->
+  <h2>2. Architectural Blueprint & Signal Pipeline</h2>
+  <div class="card">
+    <pre>
+[ Smart Cane Hardware ] ──► [ Ultrasonic (HC-SR04) ] ──► 360° Circular Radar HUD (UltrasonicRadar.jsx)
+                       ──► [ IMU BNO085 (9-DoF) ]    ──► Fall Detection Listener (Acceleration > 32 m/s²)
+                       ──► [ u-blox NEO-M9N GPS ]   ──► OpenStreetMap Reverse Geocoder (Real Address)
+                       ──► [ RGB Camera Stream ]     ──► YOLOv11 Tensor Engine + CANIE Filter (h/w >= 1.6)
+                                                                   │
+                                                                   ▼
+                                                     [ Audio Guidance Engine (audioService.js) ]
+                                                     • Spoken Guidance: Web Speech API (TTS)
+                                                     • Acoustic Cues: Web Audio API (Synthesizers)
+                                                                   │
+                                                                   ▼
+                                                     [ SOS Distress Broadcast Modal ]
+                                                     • WhatsApp Direct Pre-filled Broadcast (wa.me)
+                                                     • Instant SMS Dispatch (sms: protocol)
+                                                     • Mentors Telemetry Email (mailto: protocol)
+    </pre>
+  </div>
+
+  <!-- Detailed Feature Modules -->
+  <h2>3. Detailed Breakdown of Developed Modules</h2>
+
+  <h3>3.1 Edge AI Object Detection & CANIE Geometrical Disambiguation</h3>
+  <ul>
+    <li><strong>YOLOv11 & MobileNetV2 Pipeline:</strong> Real-time computer vision operating at 30+ FPS, detecting everyday obstacles: persons, vehicles, chairs, doors, stairs, phones, and bottles.</li>
+    <li><strong>CANIE Aspect-Ratio Filter (Bottle vs. Remote Disambiguation):</strong> Standard object detectors frequently misclassified vertical water bottles as TV remotes. We engineered a geometrical heuristic layer analyzing the bounding box aspect ratio (<code>height / width &ge; 1.6</code>) and spatial density, reliably resolving the object as a bottle with directional spatial cues (<em>"Bottle ahead on left"</em>).</li>
+    <li><strong>Proximity & Spatial Mapping:</strong> Automatically divides the field of view into directional sectors (<em>Left, Center, Right</em>) and distance thresholds (<em>Very Close &lt; 0.8m, Close &lt; 1.5m, Mid-Range &lt; 2.5m</em>).</li>
+  </ul>
+
+  <h3>3.2 Spoken Audio Feedback & Acoustic Synthesizer (<code>audioService.js</code>)</h3>
+  <ul>
+    <li><strong>Web Speech API:</strong> Spoken real-time announcements with custom voice pitch and rate, notifying the user immediately when hazards enter their path.</li>
+    <li><strong>Web Audio API Acoustic Synthesizer:</strong> Built-in multi-frequency audio synthesizers producing directional sonar pings, hazard alert chimes, and emergency klaxons without external audio file dependencies.</li>
+    <li><strong>Non-Blocking Speech Queue:</strong> Intelligent deduplication prevents audio stuttering and speech overlapping during high-density obstacle detection.</li>
+  </ul>
+
+  <h3>3.3 360° Circular Sonar Radar HUD (<code>UltrasonicRadar.jsx</code>)</h3>
+  <ul>
+    <li>Interactive cybernetic canvas displaying a continuous 360° radar sweep with <code>0.5m</code>, <code>1.0m</code>, and <code>2.0m</code> safety distance rings.</li>
+    <li>Translates ultrasonic sensor telemetry into color-coded hazard blips (Green = Safe, Amber = Caution, Red = Immediate Obstacle).</li>
+  </ul>
+
+  <div class="page-break"></div>
+
+  <h3>3.4 SOS Center, Fall Simulation & Emergency Caregiver Notification (<code>SOS.jsx</code>)</h3>
+  <ul>
+    <li><strong>Giant Emergency Distress Trigger:</strong> Large, high-contrast SOS button with ripple animations, spoken vocal alarm, and immediate distress telemetry broadcast.</li>
+    <li><strong>Dedicated Fall Simulation Button:</strong> A prominent <code>⚡ Simulate IMU Fall Event — BNO085 Test</code> button allowing direct verification of fall logic without needing to drop physical hardware.</li>
+    <li><strong>Hardware Fall Sensor Listener:</strong> Listens to browser and cane <code>devicemotion</code> acceleration ($> 32\text{ m/s}^2$) with a 15-second debounce filter.</li>
+    <li><strong>Real Live Location via Reverse Geocoding:</strong> Automatically fetches real GPS coordinates from <code>navigator.geolocation</code> and queries OpenStreetMap Nominatim to resolve actual human-readable street names, neighbourhoods, and postal codes (e.g., <em>Rajanukunte, Bengaluru, Karnataka</em>). Institutional fallback set to SVIT Campus coordinates (<code>13.16335° N, 77.56278° E</code>).</li>
+    <li><strong>Emergency Contacts & 1-Tap Broadcast Suite:</strong> Clean contact cards featuring a single, aligned green call button (<code>tel:...</code>) for <strong>Vikram Sir</strong> and <strong>Tejas P</strong>. The Emergency Broadcast Modal provides 1-tap notifications:
+      <ul>
+        <li><strong>WhatsApp Broadcast:</strong> Pre-fills live GPS coordinates, battery level, time, and Google Maps pin.</li>
+        <li><strong>SMS Direct Dispatch:</strong> Sends distress packet via native messaging app.</li>
+        <li><strong>Email Dispatch:</strong> Formats formal distress notification directly to mentor email addresses.</li>
+      </ul>
+    </li>
+    <li><strong>Persistent SOS History:</strong> Maintains a chronological audit trail of all manual and fall triggers in <code>localStorage</code> with live synchronization to the FastAPI backend.</li>
+  </ul>
+
+  <h3>3.5 Dashboard, Insights & Analytical Reports (<code>Dashboard.jsx</code>, <code>Insights.jsx</code>, <code>Reports.jsx</code>)</h3>
+  <ul>
+    <li><strong>Live Telemetry Dashboard:</strong> Visual cards tracking Journey Today (2.4 km), Cane Battery (86%), AI Detections count (33), and SOS status (Safe).</li>
+    <li><strong>Analytical Insights:</strong> Daily and weekly navigation bar charts, breakdown of most-detected obstacles, and total active hours.</li>
+    <li><strong>Instant CSV Exports:</strong> Generates formatted CSV downloads for journey logs, detection history, and executive summary reports.</li>
+    <li><strong>Zero-Lag Loading:</strong> Removed full-screen loading spinners, enabling instantaneous 0ms tab switching.</li>
+  </ul>
+
+  <h3>3.6 Institutional Profile & Settings Management (<code>Settings.jsx</code>, <code>Sidebar.jsx</code>, <code>Topbar.jsx</code>)</h3>
+  <ul>
+    <li><strong>Role & Identity Enforcement:</strong> User role permanently set to <strong>Student</strong> across all components, form fields, sidebar badges, and backend schemas. Name formatted as <strong>Thanya C Ravi</strong>.</li>
+    <li><strong>Complete Removal of User Stock Photos:</strong> Removed all stock image URLs and <code>&lt;img&gt;</code> avatar tags across the entire application. Replaced with the clean, modern initial badge (<strong>"T"</strong> inside an indigo gradient).</li>
+    <li><strong>High-Contrast Theme Switcher:</strong> One-tap toggle between sleek dark mode and high-visibility daylight mode.</li>
+  </ul>
+
+  <h3>3.7 Navigation Architecture & Performance Optimization (<code>Layout.jsx</code>)</h3>
+  <ul>
+    <li>Removed Framer Motion <code>mode="wait"</code> and 400ms exit delays that previously caused visual hitching.</li>
+    <li>Implemented a fluid <code>0.15s</code> opacity crossfade, delivering smooth 60 FPS transitions between pages.</li>
+    <li>Configured dual-mode authentication: seamless online JWT authorization + offline evaluation mode on Vercel.</li>
+  </ul>
+
+  <!-- Problem-Resolution Matrix -->
+  <h2>4. Engineering Changelog & Problem-Resolution Matrix</h2>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 28%;">Issue Encountered</th>
+        <th style="width: 32%;">Root Cause</th>
+        <th style="width: 40%;">Engineering Resolution</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Blank Screen on Vercel</strong></td>
+        <td>Axios parsed 404 HTML fallback as JSON; <code>.map()</code> called on non-array.</td>
+        <td>Implemented HTML-detection interceptor in <code>api.js</code> and added <code>Array.isArray()</code> guards across all views.</td>
+      </tr>
+      <tr>
+        <td><strong>Lowercase JSX Tag Crash</strong></td>
+        <td>Lowercase component names (<code>&lt;s.icon&gt;</code>) treated as invalid HTML tags.</td>
+        <td>Renamed dynamically imported icons to capitalized identifiers (<code>SourceIcon</code>, <code>ReportIcon</code>).</td>
+      </tr>
+      <tr>
+        <td><strong>Silent Detection (No Voice)</strong></td>
+        <td>Web Speech API uninitialized; audio defaulted to muted.</td>
+        <td>Engineered <code>audioService.js</code> uniting Web Speech TTS with Web Audio synthesizers; enabled voice by default.</td>
+      </tr>
+      <tr>
+        <td><strong>Bottle Detected as Remote</strong></td>
+        <td>COCO dataset weights misclassify vertical cylindrical items.</td>
+        <td>Implemented CANIE aspect-ratio heuristic (<code>h/w &ge; 1.6</code>) to accurately classify water bottles.</td>
+      </tr>
+      <tr>
+        <td><strong>Missing Fall Simulation</strong></td>
+        <td>Only hardware toggle existed; no manual test trigger.</td>
+        <td>Created high-visibility <code>⚡ Simulate IMU Fall Event — BNO085 Test</code> button in <code>SOS.jsx</code>.</td>
+      </tr>
+      <tr>
+        <td><strong>Caregiver Notifications</strong></td>
+        <td>Caregivers required automated distress notifications.</td>
+        <td>Built Emergency Dispatch Modal with 1-tap WhatsApp, SMS, and Email broadcast containing live GPS coordinates.</td>
+      </tr>
+      <tr>
+        <td><strong>Call Button Misalignment</strong></td>
+        <td>4 crowded action pills on contact card shifted the call button.</td>
+        <td>Restored single, aligned green call button (<code>tel:...</code>) on contact row; moved notification actions into modal.</td>
+      </tr>
+      <tr>
+        <td><strong>Role Showing "Lead Researcher"</strong></td>
+        <td>Cached session in <code>localStorage</code> and fallback strings.</td>
+        <td>Enforced role = <code>"Student"</code> and name = <code>"Thanya C Ravi"</code> across all auth contexts, settings, and schemas.</td>
+      </tr>
+      <tr>
+        <td><strong>User Stock Photo Showing</strong></td>
+        <td>Unsplash image URL populated in user avatar state.</td>
+        <td>Completely eliminated all stock image URLs; replaced with clean initial badge (<strong>"T"</strong>).</td>
+      </tr>
+      <tr>
+        <td><strong>Generic Location String</strong></td>
+        <td>Raw GPS coordinates displayed without reverse geocoding.</td>
+        <td>Integrated OpenStreetMap Nominatim API to resolve real-world street, locality, and city.</td>
+      </tr>
+      <tr>
+        <td><strong>Page Transition Lag</strong></td>
+        <td>Framer Motion <code>mode="wait"</code> with 400ms delay + full-screen loaders.</td>
+        <td>Replaced with instant <code>0.15s</code> crossfade and initialized local state immediately for 0ms transitions.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="page-break"></div>
+
+  <!-- Technical Stack -->
+  <h2>5. Technical Stack & Hardware Specifications</h2>
+  <div class="two-col">
+    <div class="card">
+      <h3>Frontend Software Stack</h3>
+      <ul>
+        <li><strong>Framework:</strong> React 18 (Create React App + CRACO)</li>
+        <li><strong>Styling:</strong> Tailwind CSS, PostCSS, Radix UI</li>
+        <li><strong>Animation:</strong> Framer Motion (0.15s crossfade)</li>
+        <li><strong>Icons:</strong> Lucide React (Explicit modular imports)</li>
+        <li><strong>Speech & Audio:</strong> Web Speech API + Web Audio API</li>
+        <li><strong>Reverse Geocoding:</strong> OpenStreetMap Nominatim</li>
+        <li><strong>Deployment:</strong> Vercel Global Edge Network</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Hardware & Edge Vision Stack</h3>
+      <ul>
+        <li><strong>Vision Model:</strong> Ultralytics YOLOv11 Nano (<code>yolo11n.pt</code>)</li>
+        <li><strong>Disambiguation:</strong> CANIE Aspect-Ratio Geometric Filter</li>
+        <li><strong>Ultrasonic Sonar:</strong> HC-SR04 Rangefinder (2cm–400cm)</li>
+        <li><strong>IMU Sensor:</strong> BNO085 9-DoF Accelerometer & Gyroscope</li>
+        <li><strong>GPS Telemetry:</strong> u-blox NEO-M9N GNSS Receiver</li>
+        <li><strong>Backend:</strong> FastAPI, Python 3.11, Uvicorn, PyMongo</li>
+        <li><strong>Repository:</strong> GitHub CI/CD syncing <code>master</code> & <code>main</code></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Verification Guide -->
+  <h2>6. Execution & Verification Guide</h2>
+  <div class="card">
+    <p><strong>Live Production Web Console:</strong> <a href="https://navify-ecosystem-2-0-1.vercel.app">https://navify-ecosystem-2-0-1.vercel.app</a></p>
+    <p><em>(Perform a hard refresh with <code>Ctrl + Shift + R</code> or <code>Ctrl + F5</code> to ensure the latest bundle is loaded).</em></p>
+    <pre>
+# Local Development Execution:
+1. Clone Repository:
+   git clone https://github.com/Thanyaravi/NAVIFY_Ecosystem_2.0.git
+   cd NAVIFY_Ecosystem_2.0
+
+2. Start Frontend Console:
+   cd frontend
+   npm install --legacy-peer-deps
+   npm start
+   # Web Console opens at http://localhost:3000
+
+3. Run Standalone Python Detection:
+   cd ..
+   python run_live.py
+    </pre>
+  </div>
+
+  <div class="footer-stamp">
+    <span>Certified Academic Master Documentation · Sai Vidya Institute of Technology (SVIT)</span>
+    <span>Department of CSE (AI & ML) — Major Project Phase-II</span>
+  </div>
+
+</body>
+</html>
